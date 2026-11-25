@@ -14,6 +14,8 @@ import { useToastStore } from '@/stores/toasts'
 import { desktop } from '@/services/desktop'
 import { SOUND_OPTIONS, playSound } from '@/services/sounds'
 import { LANGUAGES, useI18n } from '@/i18n'
+import { useUpdateStore } from '@/stores/updates'
+import { RefreshCw } from '@lucide/vue'
 
 const settingsStore = useSettingsStore()
 const toasts = useToastStore()
@@ -56,6 +58,52 @@ const breakSound = setting('breakCompleteSound')
 const notifyFocus = setting('notifyFocusComplete')
 const notifyBreak = setting('notifyBreakComplete')
 const notifyGoal = setting('notifyDailyGoal')
+const checkForUpdates = setting('checkForUpdates')
+
+// ── updates ─────────────────────────────────────────────────────────────────
+const updates = useUpdateStore()
+
+const updateLine = computed(() => {
+  const st = updates.state
+  if (!st) return ''
+  if (!st.enabled) return 'Update checks are not available in this build.'
+  const s = st.status
+  switch (s.kind) {
+    case 'idle':
+      return 'Not checked yet.'
+    case 'checking':
+      return 'Checking…'
+    case 'up-to-date':
+      return `You have the latest version. Checked ${new Date(s.checkedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`
+    case 'available':
+      return `Version ${s.update.version} is available.`
+    case 'downloading':
+      return `Downloading version ${s.update.version}… ${s.percent}%`
+    case 'downloaded':
+      return `Version ${s.update.version} is downloaded and ready to install.`
+    case 'error':
+      return s.message
+  }
+  return ''
+})
+
+/** How updates arrive on this particular install. */
+const updateHow = computed(() => {
+  switch (updates.state?.format) {
+    case 'nsis':
+      return 'On Windows, FocusFlow downloads the new installer, checks it against the release’s checksum, and installs it when you choose “Install and restart” (or when you quit, if you prefer).'
+    case 'rpm':
+      return 'This copy was installed from an RPM package. FocusFlow tells you when a new version is out and links to it; install it with “sudo dnf install ./<file>.rpm”. FocusFlow never runs administrator commands itself.'
+    case 'deb':
+      return 'This copy was installed from a DEB package. FocusFlow tells you when a new version is out and links to it; install it with “sudo apt install ./<file>.deb”. FocusFlow never runs administrator commands itself.'
+    case 'appimage':
+      return 'AppImages are not part of FocusFlow releases. FocusFlow tells you when a new version is out; install the DEB or RPM from the release page.'
+    case 'dev':
+      return 'This is a development build. It can check for new versions, but updates are installed by building from source.'
+    default:
+      return 'FocusFlow tells you when a new version is out and links to the release page.'
+  }
+})
 
 const themes = computed<{ value: ThemePreference; label: string; icon: typeof Sun }[]>(() => [
   { value: 'dark', label: t('settings.theme.dark'), icon: Moon },
@@ -320,6 +368,32 @@ onMounted(async () => {
             </div>
             <p class="mt-2 text-sm text-faint">JSON includes tasks, subjects, focus sessions, study blocks and settings, readable by other tools.</p>
           </div>
+        </div>
+      </section>
+
+      <section id="updates" class="settings-row py-8">
+        <div>
+          <h2 class="text-lg font-semibold">{{ t('settings.updates') }}</h2>
+          <p class="mt-1 text-muted">{{ t('settings.updates.hint') }}</p>
+        </div>
+        <div class="flex max-w-lg flex-col gap-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <p>
+              <span class="block">FocusFlow {{ updates.state?.currentVersion ?? '' }}</span>
+              <span class="block text-sm" :class="updates.state?.status.kind === 'error' ? 'text-danger' : 'text-muted'" aria-live="polite">{{ updateLine }}</span>
+            </p>
+            <button
+              type="button"
+              class="data-btn"
+              :disabled="!updates.state?.enabled || updates.state?.status.kind === 'checking' || updates.state?.status.kind === 'downloading'"
+              @click="updates.check()"
+            >
+              <RefreshCw :size="15" :stroke-width="1.75" :class="updates.state?.status.kind === 'checking' && 'animate-spin'" />
+              {{ t('settings.updates.check') }}
+            </button>
+          </div>
+          <ToggleSwitch v-model="checkForUpdates" :label="t('settings.updates.auto')" :description="t('settings.updates.auto.hint')" />
+          <p class="text-sm text-faint">{{ updateHow }}</p>
         </div>
       </section>
 

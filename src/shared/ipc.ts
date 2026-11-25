@@ -55,6 +55,15 @@ export const IPC = {
   dataCancelReplace: 'data:cancel-replace',
   appOpenLogFolder: 'app:open-log-folder',
 
+  updatesGetState: 'updates:get-state',
+  updatesCheck: 'updates:check',
+  updatesDismiss: 'updates:dismiss',
+  updatesDownload: 'updates:download',
+  updatesInstall: 'updates:install',
+  updatesInstallOnQuit: 'updates:install-on-quit',
+  updatesOpenRelease: 'updates:open-release',
+  updatesStateChanged: 'updates:state-changed',
+
   /** Pushed after any change to tasks, subjects or recorded sessions. */
   dataChanged: 'data:changed'
 } as const

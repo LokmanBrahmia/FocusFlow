@@ -13,6 +13,7 @@ import { parseDateRange, parseRating } from '@shared/statistics'
 import type { StatisticsRepository } from '../database/repositories/statisticsRepository'
 import type { FocusSessionRepository } from '../database/repositories/focusSessionRepository'
 import { TaskNotFoundError, type TimerService } from '../timer/timerService'
+import { UpdateActionError } from '../updates/updateService'
 
 export class ValidationError extends Error {
   override name = 'ValidationError'
@@ -51,7 +52,7 @@ export function handle<T>(
     try {
       return { ok: true, data: await fn(...args) }
     } catch (err) {
-      if (err instanceof ValidationError || err instanceof InputError) {
+      if (err instanceof ValidationError || err instanceof InputError || err instanceof UpdateActionError) {
         return { ok: false, error: { code: 'VALIDATION', message: err.message } }
       }
       if (err instanceof TaskNotFoundError || err instanceof TaskNotFound || err instanceof SubjectNotFound || err instanceof TimeBlockNotFound) {

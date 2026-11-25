@@ -13,6 +13,7 @@ import type {
 import type { AppSettings, SettingKey } from '@shared/settings'
 import type { DayPlan, TimeBlock, TimeBlockInput } from '@shared/planner'
 import type { DateRange, Statistics } from '@shared/statistics'
+import type { UpdateState } from '@shared/updates'
 import type { SessionType, StartTimerInput, TimerEvent, TimerState } from '@shared/timer'
 
 /**
@@ -86,6 +87,22 @@ export interface DesktopAPI {
     /** Replaces all data with the prepared file, after an automatic safety backup. */
     confirmReplace(token: string): Promise<ReplaceResult>
     cancelReplace(token: string): Promise<void>
+  }
+  updates: {
+    getState(): Promise<UpdateState>
+    /** Manual check: errors are reported in the returned state. */
+    check(): Promise<UpdateState>
+    /** "Later": hide the notice for this version for the rest of the session. */
+    dismiss(version: string): Promise<UpdateState>
+    /** Windows only: download the verified installer. */
+    download(): Promise<UpdateState>
+    /** Windows only: quit and install. Refused during a focus session unless acknowledged. */
+    install(options?: { acknowledgeActiveSession?: boolean }): Promise<void>
+    /** Windows only: install the downloaded update the next time FocusFlow quits. */
+    setInstallOnQuit(enabled: boolean): Promise<UpdateState>
+    /** Opens a FocusFlow release page or file on github.com in the browser. */
+    openRelease(url: string): Promise<void>
+    onStateChange(callback: (state: UpdateState) => void): () => void
   }
   /** Fires after tasks, subjects or sessions change in any window. */
   onDataChanged(callback: (entity: DataEntity) => void): () => void

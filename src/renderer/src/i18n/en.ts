@@ -46,6 +46,13 @@ export const en = {
   'settings.data.backup': 'Back up database',
   'settings.data.restore': 'Restore backup',
 
+  'settings.updates': 'Updates',
+  'settings.updates.hint': 'New versions are published on GitHub Releases.',
+  'settings.updates.auto': 'Check for updates automatically',
+  'settings.updates.auto.hint':
+    'FocusFlow asks GitHub for the latest version shortly after it starts and every few hours. No personal data is sent. This is the only time FocusFlow uses the internet.',
+  'settings.updates.check': 'Check for updates',
+
   'settings.shortcuts': 'Keyboard shortcuts',
   'settings.shortcuts.hint': 'Shortcuts pause while you type in a field.',
   'settings.about': 'About',

@@ -17,27 +17,19 @@ for f in "$DEB" "$RPM"; do
   [[ -f "$ROOT/release/$f" ]] || { echo "Missing release/$f. Run: npm run dist:linux" >&2; exit 1; }
 done
 
-SMOKE='timeout 120 xvfb-run -a focusflow --smoke-test 2>/dev/null | grep FOCUSFLOW_SMOKE'
-
 run() {
-  local name="$1" image="$2" install="$3"
+  local name="$1" image="$2" package="$3"
   echo "── $name ($image) ──────────────────────────────────────────"
-  "$ENGINE" run --rm -v "$ROOT/release:/pkgs:ro,z" "$image" bash -euo pipefail -c "
-    $install
-    useradd -m tester
-    echo 'Installed:' \$(command -v focusflow)
-    su tester -c '$SMOKE'
-  "
+  # seccomp=unconfined: Docker's default profile blocks the unprivileged user
+  # namespaces Chromium's sandbox uses; desktop Ubuntu and Fedora allow them.
+  # The app's sandbox stays ON (no --no-sandbox).
+  "$ENGINE" run --rm --security-opt seccomp=unconfined \
+    -v "$ROOT/release:/pkgs:ro,z" \
+    -v "$ROOT/scripts/container-smoke.sh:/container-smoke.sh:ro,z" \
+    "$image" bash /container-smoke.sh "/pkgs/$package"
 }
 
-run "Ubuntu 22.04 / DEB" ubuntu:22.04 "
-  export DEBIAN_FRONTEND=noninteractive
-  apt-get update -qq >/dev/null
-  apt-get install -y -qq /pkgs/$DEB xvfb xauth >/dev/null
-"
-
-run "Fedora 41 / RPM" fedora:41 "
-  dnf install -y -q /pkgs/$RPM xorg-x11-server-Xvfb xorg-x11-xauth util-linux shadow-utils >/dev/null
-"
+run "Ubuntu 22.04 / DEB" ubuntu:22.04 "$DEB"
+run "Fedora 41 / RPM" fedora:41 "$RPM"
 
 echo "All package smoke tests passed."

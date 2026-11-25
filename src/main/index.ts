@@ -22,6 +22,7 @@ import { initLogger } from './system/logger'
 import { applyLaunchOnStartup, launchedHidden, startupSupport } from './system/startup'
 import { AppTray } from './system/tray'
 import { isSmokeTest, runSmokeTest } from './smokeTest'
+import { setupUpdates } from './updates/setupUpdates'
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 
@@ -269,6 +270,13 @@ if (SMOKE) {
         for (const entity of ['subjects', 'tasks', 'sessions', 'blocks'] as const) notifyDataChanged(entity)
       }
     })
+
+    // Update checks run in the main process only; the renderer just shows state.
+    void setupUpdates({
+      isTrustedSender,
+      autoCheckEnabled: () => settings.checkForUpdates,
+      timerActive: () => timerService.getState().status !== 'idle'
+    }).catch((err) => console.error('[updates] setup failed:', err))
 
     // Restore before any window asks for state; overdue sessions complete here.
     timerService.init()

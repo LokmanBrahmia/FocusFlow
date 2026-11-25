@@ -16,6 +16,8 @@ export interface AppSettings {
   launchOnStartup: boolean
   closeToTray: boolean
   windowBehavior: WindowBehavior
+  /** Look for new versions on GitHub Releases (the app's only network request). */
+  checkForUpdates: boolean
 
   focusDurationMinutes: number
   shortBreakMinutes: number
@@ -44,6 +46,7 @@ export const DEFAULT_SETTINGS: Readonly<AppSettings> = Object.freeze({
   launchOnStartup: false,
   closeToTray: false,
   windowBehavior: 'remember',
+  checkForUpdates: true,
 
   focusDurationMinutes: 25,
   shortBreakMinutes: 5,
@@ -82,6 +85,7 @@ export const SETTING_VALIDATORS: { [K in SettingKey]: (v: unknown) => v is AppSe
   launchOnStartup: isBool,
   closeToTray: isBool,
   windowBehavior: oneOf('remember', 'maximized', 'default'),
+  checkForUpdates: isBool,
 
   focusDurationMinutes: intIn(1, 180),
   shortBreakMinutes: intIn(1, 60),

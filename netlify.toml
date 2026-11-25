@@ -1,0 +1,14 @@
+# Netlify hosting for the FocusFlow landing page (landing/), free plan.
+# Every push to main deploys; pull requests get deploy previews.
+[build]
+  base = "landing"
+  command = "npm ci && npm run build"
+  publish = "dist"
+  # Rebuild only when the site (or the app version/repository it reads) changes.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ../package.json"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Security headers live in landing/public/_headers (copied into dist/ with a
+# build-time hash for the one inline script); Netlify applies that file as-is.

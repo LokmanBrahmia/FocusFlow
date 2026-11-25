@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { IPC, type DataEntity, type IpcResult } from '@shared/ipc'
 import type { AppSettings } from '@shared/settings'
 import type { TimerEvent, TimerState } from '@shared/timer'
+import type { UpdateState } from '@shared/updates'
 import type { DesktopAPI } from './api'
 
 /** Unwraps the result envelope so the renderer receives data or a thrown Error. */
@@ -79,6 +80,16 @@ const api: DesktopAPI = {
     prepareRestore: () => invoke(IPC.dataPrepareRestore),
     confirmReplace: (token) => invoke(IPC.dataConfirmReplace, token),
     cancelReplace: (token) => invoke(IPC.dataCancelReplace, token)
+  },
+  updates: {
+    getState: () => invoke(IPC.updatesGetState),
+    check: () => invoke(IPC.updatesCheck),
+    dismiss: (version) => invoke(IPC.updatesDismiss, version),
+    download: () => invoke(IPC.updatesDownload),
+    install: (options) => invoke(IPC.updatesInstall, options ?? {}),
+    setInstallOnQuit: (enabled) => invoke(IPC.updatesInstallOnQuit, enabled),
+    openRelease: (url) => invoke(IPC.updatesOpenRelease, url),
+    onStateChange: (cb) => subscribe<UpdateState>(IPC.updatesStateChanged, cb)
   },
   onDataChanged: (cb) => subscribe<DataEntity>(IPC.dataChanged, cb),
   platform: process.platform

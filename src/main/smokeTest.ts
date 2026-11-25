@@ -6,6 +6,7 @@ import { SettingsRepository } from './database/repositories/settingsRepository'
 import { TaskRepository } from './database/repositories/taskRepository'
 import { backupTo } from './data/dataService'
 import { createMainWindow } from './windows/mainWindow'
+import { detectPackageFormat } from './updates/backends'
 
 /**
  * `focusflow --smoke-test` checks that a packaged build works on this
@@ -41,6 +42,8 @@ export async function runSmokeTest(): Promise<void> {
     results.userData = userData
     results.packaged = app.isPackaged
     results.version = app.getVersion()
+    // How updates will be offered on this install (deb/rpm → release link, nsis → in-app).
+    results.updateFormat = detectPackageFormat()
 
     const dbPath = join(userData, 'focusflow.sqlite')
     const db = openDatabase(dbPath)

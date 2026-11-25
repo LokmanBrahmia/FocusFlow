@@ -5,8 +5,12 @@ import { isMac } from '@/services/desktop'
 import BrandMark from './BrandMark.vue'
 import ShortcutKeys from './ShortcutKeys.vue'
 import SidebarTimerStatus from './SidebarTimerStatus.vue'
+import UpdateNotice from './UpdateNotice.vue'
+import { ArrowUpCircle } from '@lucide/vue'
+import { useUpdateStore } from '@/stores/updates'
 
 const { t } = useI18n()
+const updates = useUpdateStore()
 </script>
 
 <template>
@@ -59,7 +63,18 @@ const { t } = useI18n()
       </RouterLink>
     </nav>
 
-    <div class="border-t border-line p-3 max-lg:px-2.5">
+    <div class="flex flex-col gap-3 border-t border-line p-3 max-lg:px-2.5">
+      <UpdateNotice />
+      <!-- Narrow window: the notice collapses to a badge linking to Settings. -->
+      <RouterLink
+        v-if="updates.noticeVisible"
+        to="/settings#updates"
+        :title="`FocusFlow ${updates.update?.version} is available`"
+        :aria-label="`FocusFlow ${updates.update?.version} is available. Open update settings.`"
+        class="hidden h-9 place-items-center rounded-lg text-iris hover:bg-surface-2 max-lg:grid"
+      >
+        <ArrowUpCircle :size="18" :stroke-width="1.75" />
+      </RouterLink>
       <SidebarTimerStatus />
     </div>
   </aside>

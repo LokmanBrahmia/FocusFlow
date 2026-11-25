@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { useTimerStore } from '@/stores/timer'
 import { useSubjectStore } from '@/stores/subjects'
+import { useUpdateStore } from '@/stores/updates'
 import { useTheme } from '@/composables/useTheme'
 import { useAppShortcuts } from '@/composables/useShortcuts'
 import { useCompletionSounds } from '@/composables/useTimerEvents'
@@ -17,6 +18,7 @@ const isMini = window.location.hash.startsWith('#/mini')
 const settingsStore = useSettingsStore()
 const timerStore = useTimerStore()
 const subjectStore = useSubjectStore()
+const updateStore = useUpdateStore()
 const route = useRoute()
 
 useTheme(() => settingsStore.settings.theme)
@@ -27,7 +29,10 @@ if (!isMini) useCompletionSounds()
 onMounted(() => {
   void settingsStore.load()
   void timerStore.load()
-  if (!isMini) void subjectStore.load()
+  if (!isMini) {
+    void subjectStore.load()
+    void updateStore.load()
+  }
 })
 
 watch(

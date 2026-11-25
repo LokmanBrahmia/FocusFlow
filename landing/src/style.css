@@ -1,0 +1,91 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/schibsted-grotesk';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Same tokens as the app, so the site and the product read as one thing. */
+:root {
+  --bg: #f4f5f8;
+  --surface: #ffffff;
+  --surface-2: #eceff4;
+  --line: #dde1e8;
+  --text: #151821;
+  --muted: #5b6270;
+  --faint: #7d8494;
+  --iris: #5a3fe0;
+  --iris-soft: #ece8ff;
+  --tide: #0b86b8;
+  color-scheme: light;
+}
+:root.dark {
+  --bg: #0e1016;
+  --surface: #151922;
+  --surface-2: #1c212c;
+  --line: #262c39;
+  --text: #eceef3;
+  --muted: #9aa1af;
+  --faint: #7a8291;
+  --iris: #8f7bff;
+  --iris-soft: #221d3d;
+  --tide: #5cc8f0;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-iris: var(--iris);
+  --color-iris-soft: var(--iris-soft);
+  --color-tide: var(--tide);
+  --font-sans: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Fraunces Variable', ui-serif, Georgia, serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--iris);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+.display {
+  font-family: var(--font-serif);
+  font-variation-settings:
+    'opsz' 96,
+    'SOFT' 60,
+    'WONK' 0;
+  font-weight: 420;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
