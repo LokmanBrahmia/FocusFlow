@@ -103,7 +103,7 @@ function choose(type: SessionType): void {
       <button
         type="button"
         class="flex h-13 min-w-40 items-center justify-center gap-2 rounded-full px-7 text-lg font-medium transition-[filter] hover:brightness-110"
-        :class="timer.isBreak ? 'bg-tide text-bg' : 'bg-iris text-white'"
+        :class="timer.isBreak ? 'bg-tide text-bg' : 'bg-accent text-on-accent'"
         @click="timer.toggle()"
       >
         <Pause v-if="s.status === 'running'" :size="18" :stroke-width="2.25" />

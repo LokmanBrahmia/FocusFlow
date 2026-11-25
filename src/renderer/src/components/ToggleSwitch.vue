@@ -16,7 +16,7 @@ const model = defineModel<boolean>({ required: true })
       :aria-label="label"
       :disabled="disabled"
       class="relative mt-0.5 h-5 w-9 shrink-0 rounded-full transition-colors"
-      :class="model ? 'bg-iris' : 'bg-line'"
+      :class="model ? 'bg-accent' : 'bg-line'"
       @click="model = !model"
     >
       <span

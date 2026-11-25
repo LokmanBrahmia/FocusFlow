@@ -23,7 +23,9 @@ import { applyLaunchOnStartup, launchedHidden, startupSupport } from './system/s
 import { AppTray } from './system/tray'
 import { isSmokeTest, runSmokeTest } from './smokeTest'
 import { setupUpdates } from './updates/setupUpdates'
-import { mkdtempSync } from 'node:fs'
+import { existsSync, mkdtempSync } from 'node:fs'
+import { BRAND } from '@shared/brand'
+import { DATABASE_FILE, resolveUserDataDir } from './system/userDataDir'
 import { tmpdir } from 'node:os'
 
 // Lets automated tests run against a throwaway profile. The smoke test
@@ -31,12 +33,21 @@ import { tmpdir } from 'node:os'
 const SMOKE = isSmokeTest()
 if (process.env.FOCUSFLOW_USER_DATA) app.setPath('userData', process.env.FOCUSFLOW_USER_DATA)
 else if (SMOKE) app.setPath('userData', mkdtempSync(join(tmpdir(), 'focusflow-smoke-')))
+else {
+  // Renamed from FocusFlow to Azm: keep using an existing FocusFlow data folder.
+  const resolved = resolveUserDataDir(
+    app.getPath('appData'),
+    { current: BRAND.name, legacy: BRAND.legacyName },
+    existsSync
+  )
+  app.setPath('userData', resolved.dir)
+}
 
 const TIMER_STATE_KEY = 'timer'
 const WINDOW_STATE_KEY = 'window'
 
 const userData = app.getPath('userData')
-const databasePath = join(userData, 'focusflow.sqlite')
+const databasePath = join(userData, DATABASE_FILE)
 const logFile = initLogger(userData)
 const iconDir = app.isPackaged ? join(process.resourcesPath, 'icons') : join(app.getAppPath(), 'resources', 'icons')
 
@@ -77,7 +88,7 @@ if (SMOKE) {
     try {
       db = openDatabase(databasePath)
     } catch (err) {
-      showFatalError('FocusFlow could not open its database', err)
+      showFatalError(`${BRAND.name} could not open its database`, err)
       app.exit(1)
       return
     }
@@ -281,6 +292,11 @@ if (SMOKE) {
     // Restore before any window asks for state; overdue sessions complete here.
     timerService.init()
     applySystemSettings()
+    // Rewrite the login entry so it points at this install (the path changed
+    // from /opt/FocusFlow to /opt/Azm with the rename).
+    if (settings.launchOnStartup) {
+      applyLaunchOnStartup(true).catch((err) => console.warn('[startup] could not refresh launch at login:', err))
+    }
 
     // setTimeout can fire late (or not at all) across sleep; re-check on wake.
     powerMonitor.on('resume', () => timerService.wake())

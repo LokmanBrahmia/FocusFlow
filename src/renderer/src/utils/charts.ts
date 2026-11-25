@@ -22,7 +22,7 @@ export function readChartTokens(): ChartTokens {
     line: v('--line'),
     surface: v('--surface'),
     tooltip: v('--surface-2'),
-    accent: v('--iris'),
+    accent: v('--accent'),
     font: "'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif"
   }
 }

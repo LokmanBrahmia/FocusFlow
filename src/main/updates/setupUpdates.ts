@@ -71,7 +71,7 @@ export async function setupUpdates(deps: SetupDeps): Promise<UpdateService> {
       typeof options === 'object' && options !== null && (options as Record<string, unknown>).acknowledgeActiveSession === true
     // Never cut a focus session short without the user's say-so.
     if (deps.timerActive() && !acknowledged) {
-      throw new ValidationError('A focus session is running. Confirm to restart now, or install when you quit FocusFlow.')
+      throw new ValidationError('A focus session is running. Confirm to restart now, or install when you quit Azm.')
     }
     service.install()
   })
@@ -82,7 +82,7 @@ export async function setupUpdates(deps: SetupDeps): Promise<UpdateService> {
   handle(ctx, IPC.updatesOpenRelease, async (url) => {
     // Only this repository's release pages and files on github.com.
     if (typeof url !== 'string' || !UPDATE_REPOSITORY || !isTrustedReleaseUrl(url, UPDATE_REPOSITORY)) {
-      throw new ValidationError('That link is not a FocusFlow release.')
+      throw new ValidationError('That link is not an Azm release.')
     }
     await shell.openExternal(url)
   })

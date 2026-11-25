@@ -30,7 +30,7 @@ function commit(): void {
   <label class="flex flex-col gap-1.5">
     <span class="text-sm text-muted">{{ label }}</span>
     <span
-      class="flex h-9 items-center rounded-lg border bg-surface pr-3 focus-within:border-iris"
+      class="flex h-9 items-center rounded-lg border bg-surface pr-3 focus-within:border-accent"
       :class="invalid ? 'border-danger' : 'border-line'"
     >
       <input

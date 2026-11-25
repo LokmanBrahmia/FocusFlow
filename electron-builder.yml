@@ -1,10 +1,14 @@
-# FocusFlow packaging. Version comes from package.json; nothing here repeats it.
+# Azm packaging (formerly FocusFlow). Version comes from package.json; nothing here repeats it.
 # Targets: Fedora (RPM), Ubuntu/Debian (DEB), Windows (NSIS), all x64.
 # Build with the npm scripts (dist:linux, dist:win), which always pass
 # --publish never: releases are created by .github/workflows/release.yml.
+# appId, the Linux package name ("name" in package.json) and the executable
+# name keep their FocusFlow-era values on purpose: they are how Windows (NSIS)
+# and dnf/apt recognise an upgrade of the existing install. Changing them would
+# install Azm *next to* FocusFlow instead of replacing it.
 appId: com.focusflow.app
-productName: FocusFlow
-copyright: Copyright © FocusFlow contributors
+productName: Azm
+copyright: Copyright © Azm contributors
 directories:
   buildResources: build
   output: release
@@ -52,10 +56,10 @@ linux:
   syncDesktopName: true
   icon: build/icon.png
   category: Office
-  synopsis: Pomodoro timer and study planner
-  description: Offline Pomodoro timer, task manager and study planner. Your data stays on your computer.
-  maintainer: FocusFlow maintainers
-  vendor: FocusFlow
+  synopsis: Calm focus timer, task manager and study planner
+  description: Azm (عَزم) — steady focus, meaningful progress. An offline Pomodoro timer, task manager and study planner; your data stays on your computer.
+  maintainer: Azm maintainers
+  vendor: Azm
   executableName: focusflow
   target:
     - target: deb
@@ -64,8 +68,13 @@ linux:
       arch: [x64]
   desktop:
     entry:
-      StartupWMClass: FocusFlow
-      Keywords: pomodoro;timer;study;tasks;planner;focus;
+      Name: Azm
+      Name[ar]: عَزم
+      GenericName: Focus timer and planner
+      Comment: Steady focus. Meaningful progress.
+      Comment[ar]: بِعزمٍ، خطوةً بعد خطوة
+      StartupWMClass: Azm
+      Keywords: pomodoro;timer;study;tasks;planner;focus;azm;focusflow;
 
 deb:
   artifactName: ${productName}-${version}_amd64.${ext}
@@ -109,8 +118,9 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: FocusFlow
-  # Uninstalling keeps the user's data in %APPDATA%\FocusFlow.
+  shortcutName: Azm
+  # Uninstalling keeps the user's data (%APPDATA%\Azm, or %APPDATA%\FocusFlow
+  # for installs that started as FocusFlow).
   deleteAppDataOnUninstall: false
 
 mac:

@@ -55,9 +55,9 @@ export function createMainWindow(options: WindowStateOptions = {}): BrowserWindo
     minWidth: 720,
     minHeight: 520,
     show: false,
-    title: 'FocusFlow',
+    title: 'Azm',
     autoHideMenuBar: true,
-    backgroundColor: nativeTheme.shouldUseDarkColors ? '#0E1016' : '#F4F5F8',
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#131517' : '#F4F5F4',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,

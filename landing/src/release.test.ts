@@ -35,6 +35,19 @@ describe('pickAssets', () => {
     expect(picked.exe?.name).toBe('FocusFlow-Setup-0.1.0.exe')
   })
 
+  it('matches the Azm-named packages built after the rename', () => {
+    const picked = pickAssets([
+      asset('Azm-0.3.0.x86_64.rpm'),
+      asset('Azm-0.3.0_amd64.deb'),
+      asset('Azm-Setup-0.3.0.exe.blockmap'),
+      asset('Azm-Setup-0.3.0.exe'),
+      asset('latest.yml')
+    ])
+    expect(picked.rpm?.name).toBe('Azm-0.3.0.x86_64.rpm')
+    expect(picked.deb?.name).toBe('Azm-0.3.0_amd64.deb')
+    expect(picked.exe?.name).toBe('Azm-Setup-0.3.0.exe')
+  })
+
   it('returns null for a package that is missing, instead of guessing a URL', () => {
     const picked = pickAssets([asset('FocusFlow-0.1.0_amd64.deb')])
     expect(picked).toEqual({ rpm: null, deb: expect.objectContaining({ name: 'FocusFlow-0.1.0_amd64.deb' }), exe: null })

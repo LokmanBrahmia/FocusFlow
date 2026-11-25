@@ -1,34 +1,38 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/fraunces';
-@import '@fontsource-variable/schibsted-grotesk';
+@import '@fontsource-variable/ibm-plex-sans';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-400.css';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-500.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Same tokens as the app, so the site and the product read as one thing. */
+/* "Calm Systems": the same tokens as the app, so the site and the product read
+   as one thing. Charcoal and neutral grays; mint is the only colour, used sparingly. */
 :root {
-  --bg: #f4f5f8;
+  --bg: #f4f5f4;
   --surface: #ffffff;
-  --surface-2: #eceff4;
-  --line: #dde1e8;
-  --text: #151821;
-  --muted: #5b6270;
-  --faint: #7d8494;
-  --iris: #5a3fe0;
-  --iris-soft: #ece8ff;
-  --tide: #0b86b8;
+  --surface-2: #ebeeec;
+  --line: #d9dfdb;
+  --text: #191d1b;
+  --muted: #58605c;
+  --faint: #6d7671;
+  --accent: #2b7a5b;
+  --accent-soft: #e2f0e9;
+  --on-accent: #ffffff;
+  --tide: #3d6a99;
   color-scheme: light;
 }
 :root.dark {
-  --bg: #0e1016;
-  --surface: #151922;
-  --surface-2: #1c212c;
-  --line: #262c39;
-  --text: #eceef3;
-  --muted: #9aa1af;
-  --faint: #7a8291;
-  --iris: #8f7bff;
-  --iris-soft: #221d3d;
-  --tide: #5cc8f0;
+  --bg: #131517;
+  --surface: #191c1f;
+  --surface-2: #202427;
+  --line: #2b3034;
+  --text: #e6e9e7;
+  --muted: #9aa3a0;
+  --faint: #7f8884;
+  --accent: #8ccfb0;
+  --accent-soft: #1c2a24;
+  --on-accent: #0f1a15;
+  --tide: #9db6d3;
   color-scheme: dark;
 }
 
@@ -40,11 +44,12 @@
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-faint: var(--faint);
-  --color-iris: var(--iris);
-  --color-iris-soft: var(--iris-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
   --color-tide: var(--tide);
-  --font-sans: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'Fraunces Variable', ui-serif, Georgia, serif;
+  --font-sans: 'IBM Plex Sans Variable', 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -61,21 +66,25 @@
     -webkit-font-smoothing: antialiased;
   }
   :focus-visible {
-    outline: 2px solid var(--iris);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
     border-radius: 6px;
   }
 }
 
 .display {
-  font-family: var(--font-serif);
-  font-variation-settings:
-    'opsz' 96,
-    'SOFT' 60,
-    'WONK' 0;
-  font-weight: 420;
-  letter-spacing: -0.02em;
-  line-height: 1.04;
+  font-family: var(--font-sans);
+  font-weight: 330;
+  letter-spacing: -0.025em;
+  line-height: 1.06;
+}
+
+/* Arabic text gets its own face and a taller line so marks above and below
+   the letters (fatha, kasra, tanwin) are not clipped. */
+:lang(ar) {
+  font-family: var(--font-arabic);
+  line-height: 1.6;
+  letter-spacing: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -42,7 +42,7 @@ export async function applyLaunchOnStartup(enabled: boolean): Promise<void> {
       [
         '[Desktop Entry]',
         'Type=Application',
-        'Name=FocusFlow',
+        'Name=Azm',
         'Comment=Pomodoro timer and study planner',
         `Exec="${exec}" --hidden`,
         'X-GNOME-Autostart-enabled=true',

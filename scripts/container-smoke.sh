@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs inside a clean container (see test-linux-packages.sh): installs one
-# FocusFlow package with the distribution's own package manager, so declared
+# Azm package with the distribution's own package manager, so declared
 # dependencies are resolved exactly as on a user's machine, then runs the
 # smoke test as a non-root user.
 set -euo pipefail

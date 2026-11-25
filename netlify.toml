@@ -1,4 +1,4 @@
-# Netlify hosting for the FocusFlow landing page (landing/), free plan.
+# Netlify hosting for the Azm landing page (landing/), free plan.
 # Every push to main deploys; pull requests get deploy previews.
 [build]
   base = "landing"

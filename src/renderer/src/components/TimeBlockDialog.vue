@@ -16,7 +16,7 @@ const { tasks } = useTaskList(() => ({ status: 'open', sort: 'priority', limit: 
 
 const form = reactive({ taskId: '', date: '', start: '', end: '' })
 const error = ref<string | null>(null)
-const inputClass = 'h-9 w-full rounded-lg border border-line bg-bg px-3 outline-none focus:border-iris'
+const inputClass = 'h-9 w-full rounded-lg border border-line bg-bg px-3 outline-none focus:border-accent'
 
 /** Open tasks, plus the block's own task if it has since been closed. */
 const options = computed(() => {
@@ -106,7 +106,7 @@ async function remove(): Promise<void> {
         <button type="button" class="h-9 rounded-lg border border-line px-3.5 hover:bg-surface-2" @click="open = false">
           Cancel
         </button>
-        <button type="submit" class="h-9 rounded-lg bg-iris px-4 font-medium text-white hover:brightness-110">
+        <button type="submit" class="h-9 rounded-lg bg-accent px-4 font-medium text-on-accent hover:brightness-110">
           {{ block ? 'Save block' : 'Add block' }}
         </button>
       </div>

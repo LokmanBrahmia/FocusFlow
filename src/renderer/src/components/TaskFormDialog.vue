@@ -34,7 +34,7 @@ const saving = ref(false)
 const isEdit = computed(() => actions.editing !== null)
 
 const inputClass =
-  'h-9 w-full rounded-lg border border-line bg-bg px-3 outline-none focus:border-iris aria-invalid:border-danger'
+  'h-9 w-full rounded-lg border border-line bg-bg px-3 outline-none focus:border-accent aria-invalid:border-danger'
 
 watch(
   () => actions.formOpen,
@@ -166,7 +166,7 @@ async function save(): Promise<void> {
           v-model="form.description"
           rows="3"
           :maxlength="MAX_DESCRIPTION"
-          class="w-full resize-y rounded-lg border border-line bg-bg px-3 py-2 outline-none focus:border-iris"
+          class="w-full resize-y rounded-lg border border-line bg-bg px-3 py-2 outline-none focus:border-accent"
         />
       </FormField>
 
@@ -179,7 +179,7 @@ async function save(): Promise<void> {
         <button
           type="submit"
           :disabled="saving"
-          class="h-9 rounded-lg bg-iris px-4 font-medium text-white hover:brightness-110 disabled:opacity-50"
+          class="h-9 rounded-lg bg-accent px-4 font-medium text-on-accent hover:brightness-110 disabled:opacity-50"
         >
           {{ isEdit ? 'Save task' : 'Add task' }}
         </button>

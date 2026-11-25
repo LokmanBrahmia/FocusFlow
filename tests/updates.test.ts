@@ -75,7 +75,7 @@ describe('releaseToUpdate (validating GitHub release metadata)', () => {
     expect(() => releaseToUpdate(rel('vnext'), REPO, '0.1.0', 'rpm')).toThrow(/invalid version/)
     expect(() =>
       releaseToUpdate(rel('v0.2.0', { html_url: 'https://evil.example/releases/tag/v0.2.0' }), REPO, '0.1.0', 'rpm')
-    ).toThrow(/not on FocusFlow/)
+    ).toThrow(/not on Azm/)
   })
 
   it('ignores package links that do not come from the repository', () => {

@@ -55,7 +55,7 @@ async function onDrop(e: DragEvent, date: string): Promise<void> {
         :aria-label="format(parseDay(day.date), 'EEEE d MMMM')"
         class="flex min-h-[26rem] flex-col rounded-xl border p-2.5 transition-colors"
         :class="[
-          dragOver === day.date ? 'border-iris bg-iris-soft/40' : 'border-line',
+          dragOver === day.date ? 'border-accent bg-accent-soft/40' : 'border-line',
           day.date < today && 'opacity-80'
         ]"
         @dragover.prevent="dragOver = day.date"
@@ -68,10 +68,10 @@ async function onDrop(e: DragEvent, date: string): Promise<void> {
           :title="`Open ${format(parseDay(day.date), 'EEEE')}`"
           @click="emit('openDay', day.date)"
         >
-          <span class="page-title text-3xl leading-none" :class="day.date === today && 'text-iris'">
+          <span class="page-title text-3xl leading-none" :class="day.date === today && 'text-accent'">
             {{ format(parseDay(day.date), 'd') }}
           </span>
-          <span class="text-sm" :class="day.date === today ? 'text-iris' : 'text-muted'">
+          <span class="text-sm" :class="day.date === today ? 'text-accent' : 'text-muted'">
             {{ day.date === today ? 'Today' : format(parseDay(day.date), 'EEE') }}
           </span>
         </button>
@@ -97,7 +97,7 @@ async function onDrop(e: DragEvent, date: string): Promise<void> {
             @dragstart="onDragStart($event, t)"
           >
             <button type="button" class="block w-full text-left" @click="actions.openEdit(t)">
-              <span v-if="blockTime(day, t)" class="text-xs text-iris tabular-nums">{{ blockTime(day, t) }}</span>
+              <span v-if="blockTime(day, t)" class="text-xs text-accent tabular-nums">{{ blockTime(day, t) }}</span>
               <span
                 class="line-clamp-2 break-words"
                 :class="(t.status === 'completed' || t.status === 'cancelled') && 'text-muted line-through decoration-faint'"

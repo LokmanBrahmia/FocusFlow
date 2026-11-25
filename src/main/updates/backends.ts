@@ -5,7 +5,7 @@ import { InvalidReleaseError, releaseToUpdate, type AvailableUpdate, type Packag
 import type { UpdateBackend } from './updateService'
 
 /**
- * How this copy of FocusFlow was installed. electron-builder writes a
+ * How this copy of Azm was installed. electron-builder writes a
  * `package-type` file into DEB and RPM packages; AppImages set $APPIMAGE.
  */
 export function detectPackageFormat(): PackageFormat {
@@ -43,7 +43,7 @@ export class GitHubReleaseBackend implements UpdateBackend {
 
   async check(): Promise<AvailableUpdate | null> {
     const res = await this.fetcher(`https://api.github.com/repos/${this.repository}/releases/latest`, {
-      headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'FocusFlow-update-check' },
+      headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'Azm-update-check' },
       signal: AbortSignal.timeout(15_000)
     })
     if (res.status === 404) return null // no stable release published yet
@@ -107,7 +107,7 @@ export async function createNsisBackend(repository: string): Promise<UpdateBacke
       }
     },
     install() {
-      // Not silent: the user sees the installer. Relaunch FocusFlow afterwards.
+      // Not silent: the user sees the installer. Relaunch Azm afterwards.
       updater.quitAndInstall(false, true)
     },
     setInstallOnQuit(enabled) {

@@ -1,10 +1,10 @@
 {
   "name": "focusflow",
-  "productName": "FocusFlow",
+  "productName": "Azm",
   "version": "0.2.0",
-  "description": "Offline Pomodoro timer, task manager and study planner",
+  "description": "Azm (عَزم) — a calm focus timer, task manager and study planner",
   "main": "./out/main/index.js",
-  "author": "FocusFlow",
+  "author": "Azm",
   "homepage": "https://github.com/LokmanBrahmia/FocusFlow",
   "repository": {
     "type": "git",
@@ -38,8 +38,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@fontsource-variable/fraunces": "^5.3.0",
-    "@fontsource-variable/schibsted-grotesk": "^5.3.0",
+    "@fontsource-variable/ibm-plex-sans": "^5.3.0",
+    "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
     "@lucide/vue": "^1.80.0",
     "@playwright/test": "^1.65.1",
     "@tailwindcss/vite": "^4.3.5",

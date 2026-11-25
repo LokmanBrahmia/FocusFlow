@@ -7,3 +7,6 @@ release
 test-results
 playwright-report
 *.tsbuildinfo
+
+# Netlify CLI link state (local only)
+landing/.netlify/

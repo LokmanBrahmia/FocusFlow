@@ -158,7 +158,7 @@ test('shows an available update, hides it with Later, and shows it again on a ma
   await nav('Settings').click()
   await page.getByRole('button', { name: 'Check for updates' }).click()
 
-  const notice = page.getByRole('region', { name: 'FocusFlow 9.9.9 is available' })
+  const notice = page.getByRole('region', { name: 'Azm 9.9.9 is available' })
   await expect(notice).toBeVisible()
   await expect(page.getByText('Version 9.9.9 is available.')).toBeVisible()
   // Development builds are updated manually: no in-app install is offered.
@@ -168,14 +168,14 @@ test('shows an available update, hides it with Later, and shows it again on a ma
   await expect(notice).toBeHidden()
 
   await page.getByRole('button', { name: 'Check for updates' }).click()
-  await expect(page.getByRole('region', { name: 'FocusFlow 9.9.9 is available' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Azm 9.9.9 is available' })).toBeVisible()
 })
 
 test('rejects release metadata that points outside the repository', async () => {
   await relaunchWithFixture({ html_url: 'https://evil.example/releases/tag/v9.9.9' })
   await nav('Settings').click()
   await page.getByRole('button', { name: 'Check for updates' }).click()
-  await expect(page.getByText('The release page is not on FocusFlow’s repository.')).toBeVisible()
+  await expect(page.getByText('The release page is not on Azm’s repository.')).toBeVisible()
   await expect(page.getByRole('region', { name: /is available/ })).toHaveCount(0)
 })
 
@@ -192,8 +192,8 @@ test('the update bridge only accepts valid requests', async () => {
       noNodeInRenderer: typeof window.require
     }
   })
-  expect(results.foreignLink).toBe('That link is not a FocusFlow release.')
-  expect(results.fileLink).toBe('That link is not a FocusFlow release.')
+  expect(results.foreignLink).toBe('That link is not an Azm release.')
+  expect(results.fileLink).toBe('That link is not an Azm release.')
   expect(results.badVersion).toBe('Invalid version.')
   expect(results.installTooEarly).toBe('The update has not been downloaded yet.')
   expect(results.noNodeInRenderer).toBe('undefined')

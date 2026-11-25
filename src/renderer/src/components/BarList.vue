@@ -23,7 +23,7 @@ defineProps<{ items: BarItem[]; label: string }>()
       <div class="mt-1.5 h-1.5 rounded-full bg-line/50" aria-hidden="true">
         <div
           class="h-full rounded-full"
-          :style="{ width: `${Math.max(item.fraction > 0 ? 1.5 : 0, Math.min(1, item.fraction) * 100)}%`, background: item.color ?? 'var(--iris)' }"
+          :style="{ width: `${Math.max(item.fraction > 0 ? 1.5 : 0, Math.min(1, item.fraction) * 100)}%`, background: item.color ?? 'var(--accent)' }"
         />
       </div>
     </li>

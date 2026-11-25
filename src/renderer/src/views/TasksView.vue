@@ -44,7 +44,7 @@ const filtered = computed(
   () => !!filter.search.trim() || filter.status !== 'open' || filter.priority !== 'all' || filter.subjectId !== 'all'
 )
 
-const selectClass = 'h-9 rounded-lg border border-line bg-surface px-2.5 text-muted outline-none hover:text-text focus:border-iris'
+const selectClass = 'h-9 rounded-lg border border-line bg-surface px-2.5 text-muted outline-none hover:text-text focus:border-accent'
 
 function addTask(): void {
   const subjectId = filter.subjectId !== 'all' && filter.subjectId !== 'none' ? filter.subjectId : undefined
@@ -66,7 +66,7 @@ function onSubjectDeleted(id: string): void {
       <template #actions>
         <AppButton variant="primary" :icon="Plus" @click="addTask">
           New task
-          <ShortcutKeys :keys="['Mod', 'N']" class="ml-1 opacity-80 [&_kbd]:border-white/30 [&_kbd]:bg-transparent [&_kbd]:text-white" />
+          <ShortcutKeys :keys="['Mod', 'N']" class="ml-1 opacity-80 [&_kbd]:border-on-accent/25 [&_kbd]:bg-transparent [&_kbd]:text-on-accent" />
         </AppButton>
       </template>
     </PageHeader>
@@ -124,7 +124,7 @@ function onSubjectDeleted(id: string): void {
               v-model="filter.search"
               type="search"
               placeholder="Search by title"
-              class="h-9 w-full rounded-lg border border-line bg-surface pr-3 pl-9 outline-none focus:border-iris"
+              class="h-9 w-full rounded-lg border border-line bg-surface pr-3 pl-9 outline-none focus:border-accent"
             />
           </label>
           <select v-model="filter.status" aria-label="Status" :class="selectClass">
@@ -150,7 +150,7 @@ function onSubjectDeleted(id: string): void {
           <template v-else-if="tasks.length === 0">
             <div v-if="filtered" class="py-8 text-muted">
               No tasks match these filters.
-              <button type="button" class="ml-1 text-iris hover:underline" @click="clearFilters">Clear filters</button>
+              <button type="button" class="ml-1 text-accent hover:underline" @click="clearFilters">Clear filters</button>
             </div>
             <EmptyState
               v-else

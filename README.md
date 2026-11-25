@@ -1,6 +1,8 @@
-# FocusFlow
+# Azm · عَزم
 
-An offline Pomodoro timer, task manager and study planner for Fedora, Ubuntu and Windows.
+*Steady focus. Meaningful progress.* · «بِعزمٍ، خطوةً بعد خطوة»
+
+Azm (formerly **FocusFlow**) is an offline Pomodoro timer, task manager and study planner for Fedora, Ubuntu and Windows.
 Built with Electron, Vue 3, TypeScript, Tailwind CSS and SQLite. Everything is stored locally.
 The only network request is the update check against GitHub Releases, which can be turned off
 in Settings and sends no personal data.
@@ -73,13 +75,13 @@ npm run dev
 | `npm run build` | Type-check and build to `out/` |
 | `npm run preview` | Run the production build |
 | `npm run verify:native` | Check better-sqlite3 loads in Node and Electron |
-| `npm run dist:linux` | Build `release/FocusFlow-<version>_amd64.deb` and `.x86_64.rpm` |
-| `npm run dist:win` | Build `release/FocusFlow-Setup-<version>.exe` (on Windows) |
+| `npm run dist:linux` | Build `release/Azm-<version>_amd64.deb` and `.x86_64.rpm` |
+| `npm run dist:win` | Build `release/Azm-Setup-<version>.exe` (on Windows) |
 | `npm run dist:appimage` | Optional AppImage (not part of releases) |
 | `npm run release:check -- v0.1.0` | Check a tag matches the package.json version |
 
 The end-to-end tests run in a temporary profile (`FOCUSFLOW_USER_DATA`), so they never touch
-your data and can run while FocusFlow is open.
+your data and can run while Azm is open.
 
 ## Packaging and releases
 
@@ -104,23 +106,23 @@ scripts/test-linux-packages.sh docker # install both packages in clean Ubuntu/Fe
 - **Launch at login** works from installed packages: it writes
   `~/.config/autostart/focusflow.desktop` on Linux and uses the login items on Windows.
 - **Tray icon:** stock GNOME hides tray icons. Install the *AppIndicator and KStatusNotifierItem
-  Support* extension to see FocusFlow's tray icon. Closing the window to the tray still works
+  Support* extension to see Azm's tray icon. Closing the window to the tray still works
   without it.
 
 ## Updates
 
-FocusFlow checks GitHub Releases for a newer **stable** version about 20 seconds after it starts
+Azm checks GitHub Releases for a newer **stable** version about 20 seconds after it starts
 and then every 6 hours. Drafts and prereleases are ignored. You can turn automatic checks off,
 or check by hand, in **Settings → Updates**. When a newer version exists, a small notice
 appears at the bottom of the sidebar with the version number, **What's new**, and **Later**,
-which hides it for that version until FocusFlow restarts or you check again. Nothing downloads,
+which hides it for that version until Azm restarts or you check again. Nothing downloads,
 installs or restarts unless you click a button for it.
 
 | Installed from | What happens | Seamless in-app update? |
 | --- | --- | --- |
-| **Windows NSIS installer** | **Download update** downloads the new installer inside the app, with progress. It is checked against the SHA-512 in the release's `latest.yml`, which is downloaded over HTTPS from this repository. Then **Install and restart**, or **Install when I quit**. If a focus session is running, FocusFlow asks first; the session is saved and continues after the restart. | **Yes** (electron-updater `NsisUpdater`) |
-| **Fedora RPM** | The notice links to the new `.rpm` on the release and shows the command to install it: `sudo dnf install ./FocusFlow-<version>.x86_64.rpm`. | **No**: notify and link |
-| **Ubuntu DEB** | The same, with `sudo apt install ./FocusFlow-<version>_amd64.deb`. | **No**: notify and link |
+| **Windows NSIS installer** | **Download update** downloads the new installer inside the app, with progress. It is checked against the SHA-512 in the release's `latest.yml`, which is downloaded over HTTPS from this repository. Then **Install and restart**, or **Install when I quit**. If a focus session is running, Azm asks first; the session is saved and continues after the restart. | **Yes** (electron-updater `NsisUpdater`) |
+| **Fedora RPM** | The notice links to the new `.rpm` on the release and shows the command to install it: `sudo dnf install ./Azm-<version>.x86_64.rpm`. | **No**: notify and link |
+| **Ubuntu DEB** | The same, with `sudo apt install ./Azm-<version>_amd64.deb`. | **No**: notify and link |
 | AppImage (optional, not released) | The notice links to the release page; install the DEB or RPM from there. | **No**: notify and link |
 | Development build (`npm run dev`) | Checks and notifies only. | No |
 
@@ -128,7 +130,7 @@ installs or restarts unless you click a button for it.
 they install by running a root shell through `pkexec`, `gksudo`, `kdesudo` or `beesu`, and fall
 back to plain `sudo`, which can't prompt from a GUI app. For RPM they run
 `dnf install --nogpgcheck -y`, which turns off package signature checks. That is unreliable
-across desktops and weakens security, so FocusFlow never runs administrator commands itself.
+across desktops and weakens security, so Azm never runs administrator commands itself.
 Your package manager installs the update.
 
 **Trust:** all update logic runs in the main process. The renderer can only call a few
@@ -163,13 +165,18 @@ publish `dist`, Node 22. Full instructions are in
 
 ## Where data lives
 
-On Windows the same files are in `%APPDATA%\FocusFlow\`.
+New installs keep their data in `~/.config/Azm/` (Linux) or `%APPDATA%\Azm\` (Windows).
 
 | Path (Linux) | Contents |
 | --- | --- |
-| `~/.config/FocusFlow/focusflow.sqlite` | The database (WAL mode) |
-| `~/.config/FocusFlow/backups/` | Automatic safety copies taken before import/restore |
-| `~/.config/FocusFlow/logs/main.log` | Warnings and errors, capped at about 1 MB |
+| `~/.config/Azm/focusflow.sqlite` | The database (WAL mode) |
+| `~/.config/Azm/backups/` | Automatic safety copies taken before import/restore |
+| `~/.config/Azm/logs/main.log` | Warnings and errors, capped at about 1 MB |
+
+**Installs from before the rename.** If `~/.config/FocusFlow/focusflow.sqlite` (or
+`%APPDATA%\FocusFlow\focusflow.sqlite`) exists and the Azm folder has no database yet, Azm keeps
+using the FocusFlow folder (`src/main/system/userDataDir.ts`). Nothing is moved, copied or
+deleted, so downgrading to FocusFlow 0.2.0 still finds the same data.
 
 ## Architecture
 
@@ -206,15 +213,32 @@ src/
 
 ## Design
 
-- Type: Fraunces for page titles, numbers and the timer, and Schibsted Grotesk for the
-  interface. Both are bundled for offline use.
-- Colour: blue-leaning dark (the default) and a cool light theme. Iris marks focus and tide
-  marks breaks. Subject colours come from a palette checked for colour-blind separation on
-  both themes.
+"Calm Systems": quiet, precise, nothing decorative.
+
+- **Name:** Azm in Latin script, عَزم in Arabic (with a fatha on the ʿayn). Both live in
+  `src/shared/brand.ts`, together with the English and Arabic taglines.
+- **Type:** IBM Plex Sans (variable) for everything Latin, including the light-weight timer
+  digits, and IBM Plex Sans Arabic for Arabic text. Both are bundled for offline use. Arabic
+  runs are marked `lang="ar" dir="rtl"` and get a taller line height so diacritics are not
+  clipped; the rest of the interface stays left-to-right.
+- **Colour:** deep charcoal dark theme (the default) and a neutral light theme. A muted mint
+  (`--accent`) is the only brand colour and marks focus and primary actions; a muted blue
+  (`--tide`) marks breaks. No gradients, glow or translucency. Subject colours come from a
+  palette checked for colour-blind separation on both themes.
+- **Mark:** one continuous stroke that echoes the letter ع and ends in a dot, a path walked
+  step by step. It is abstract, not calligraphy, and stays legible at 16 px. The sources are
+  in `brand/` (`azm-mark.svg`, `azm-icon.svg`, `azm-tray.svg`); `scripts/build-icons.sh`
+  generates every app, tray and website icon from them (needs ImageMagick 7).
 
 ## Status and known limitations
 
 All six phases of the specification are implemented.
+
+- **Names kept from FocusFlow on purpose:** the app ID `com.focusflow.app`, the npm and Linux
+  package name `focusflow`, the executable `focusflow`, `focusflow.desktop`, the database file
+  `focusflow.sqlite`, the export format `focusflow-export`, the `FOCUSFLOW_*` environment
+  variables and the GitHub repository. Changing them would make the new version install beside
+  the old one instead of upgrading it, or stop it from reading existing data and exports.
 
 - **Translations:** only English ships. The i18n layer (`src/renderer/src/i18n/`) and
   right-to-left support are in place. Navigation and Settings use it; the other views still

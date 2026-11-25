@@ -98,9 +98,9 @@ export interface DesktopAPI {
     download(): Promise<UpdateState>
     /** Windows only: quit and install. Refused during a focus session unless acknowledged. */
     install(options?: { acknowledgeActiveSession?: boolean }): Promise<void>
-    /** Windows only: install the downloaded update the next time FocusFlow quits. */
+    /** Windows only: install the downloaded update the next time Azm quits. */
     setInstallOnQuit(enabled: boolean): Promise<UpdateState>
-    /** Opens a FocusFlow release page or file on github.com in the browser. */
+    /** Opens an Azm release page or file on github.com in the browser. */
     openRelease(url: string): Promise<void>
     onStateChange(callback: (state: UpdateState) => void): () => void
   }

@@ -36,7 +36,7 @@ const plural = (n: number, one: string): string => `${n} ${n === 1 ? one : `${on
     >
       <div
         class="h-full rounded-full transition-[width] duration-500"
-        :class="reached ? 'bg-moss' : 'bg-iris'"
+        :class="reached ? 'bg-moss' : 'bg-accent'"
         :style="{ width: `${progress * 100}%` }"
       />
     </div>

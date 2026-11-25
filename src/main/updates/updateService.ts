@@ -23,7 +23,7 @@ export interface UpdateBackend {
   /** Resolves to the newer release, or null when already up to date. */
   check(): Promise<AvailableUpdate | null>
   download?(onProgress: (p: DownloadProgress) => void): Promise<void>
-  /** Quits FocusFlow and runs the downloaded installer. */
+  /** Quits Azm and runs the downloaded installer. */
   install?(): void
   setInstallOnQuit?(enabled: boolean): void
 }
@@ -139,7 +139,7 @@ export class UpdateService {
     const s = this.status
     const update = s.kind === 'available' ? s.update : s.kind === 'error' && s.during === 'download' ? s.update : null
     if (!backend?.download || backend.mode !== 'install') {
-      throw new UpdateActionError('This version of FocusFlow is updated by installing the new package from the release page.')
+      throw new UpdateActionError('This version of Azm is updated by installing the new package from the release page.')
     }
     if (!update) throw new UpdateActionError('There is no update to download.')
 

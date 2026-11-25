@@ -24,8 +24,8 @@ export function createMiniTimerWindow(): BrowserWindow {
     skipTaskbar: true,
     alwaysOnTop: true,
     show: false,
-    title: 'FocusFlow timer',
-    backgroundColor: nativeTheme.shouldUseDarkColors ? '#151922' : '#FFFFFF',
+    title: 'Azm timer',
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#191C1F' : '#FFFFFF',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,

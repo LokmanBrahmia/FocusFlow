@@ -38,7 +38,7 @@ onMounted(() => {
 watch(
   () => route.meta.title,
   (title) => {
-    document.title = title ? `${title} — FocusFlow` : 'FocusFlow'
+    document.title = title ? `${title} — Azm` : 'Azm'
   },
   { immediate: true }
 )

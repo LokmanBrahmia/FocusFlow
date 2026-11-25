@@ -1,0 +1,9 @@
+<!--
+  Azm app icon (source for every raster icon; regenerate with
+  scripts/build-icons.sh). Charcoal tile, mint mark, soft-white step dot.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <rect width="24" height="24" rx="5.4" fill="#131517"/>
+  <path d="M14.44 5.69A3.1 3.1 0 1 0 12 10.7A4.5 4.5 0 1 0 15.55 17.97" fill="none" stroke="#8CCFB0" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="17.33" cy="15.69" r="1.35" fill="#E6E9E7"/>
+</svg>

@@ -22,14 +22,12 @@ const glyphs = computed(() => formatClock(props.ms).split(''))
 <style scoped>
 .timer-digits {
   display: inline-flex;
-  font-family: var(--font-serif);
-  font-variation-settings:
-    'opsz' 144,
-    'SOFT' 100,
-    'WONK' 0;
-  font-weight: 340;
+  /* Light Plex Sans with tabular figures: calm, exact, no jitter as digits change. */
+  font-family: var(--font-sans);
+  font-weight: 250;
+  font-feature-settings: 'tnum';
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 .digit {
   display: inline-block;
@@ -40,7 +38,7 @@ const glyphs = computed(() => formatClock(props.ms).split(''))
   display: inline-block;
   width: 0.3em;
   text-align: center;
-  transform: translateY(-0.06em);
-  opacity: 0.55;
+  transform: translateY(-0.04em);
+  opacity: 0.45;
 }
 </style>

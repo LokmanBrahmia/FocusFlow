@@ -40,7 +40,7 @@ defineExpose({ done: () => (busy.value = false) })
   <AppDialog v-model:open="open" :title="preview?.kind === 'restore' ? 'Restore this backup?' : 'Import this file?'" width="30rem">
     <template v-if="preview">
       <p class="text-muted">
-        Everything currently in FocusFlow will be replaced by <span class="text-text">{{ source }}</span>.
+        Everything currently in Azm will be replaced by <span class="text-text">{{ source }}</span>.
         A copy of your current data is saved first, so you can restore it if needed.
       </p>
 

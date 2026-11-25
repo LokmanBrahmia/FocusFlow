@@ -22,7 +22,7 @@ const offset = computed(() => C * (1 - Math.min(1, Math.max(0, props.progress)))
         cy="50"
         :r="R"
         fill="none"
-        :stroke="tone === 'focus' ? 'var(--iris)' : 'var(--tide)'"
+        :stroke="tone === 'focus' ? 'var(--accent)' : 'var(--tide)'"
         stroke-width="2.2"
         stroke-linecap="round"
         :stroke-dasharray="C"

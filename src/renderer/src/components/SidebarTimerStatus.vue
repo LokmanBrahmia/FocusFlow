@@ -27,7 +27,7 @@ const label = computed(() => {
           ? 'border border-faint'
           : timer.isBreak
             ? 'bg-tide'
-            : 'bg-iris'
+            : 'bg-accent'
       "
       aria-hidden="true"
     />

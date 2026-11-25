@@ -75,7 +75,7 @@ async function save(): Promise<void> {
           :aria-label="`${n}: ${LABELS[n - 1]}`"
           :title="LABELS[n - 1]"
           class="h-10 rounded-lg border text-lg tabular-nums transition-colors"
-          :class="rating === n ? 'border-iris bg-iris text-white' : 'border-line hover:bg-surface-2'"
+          :class="rating === n ? 'border-accent bg-accent text-on-accent' : 'border-line hover:bg-surface-2'"
           @click="rating = n"
         >
           {{ n }}
@@ -93,7 +93,7 @@ async function save(): Promise<void> {
             rows="2"
             :maxlength="MAX_NOTE"
             placeholder="Anything worth remembering? (optional)"
-            class="w-full resize-none rounded-lg border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-iris"
+            class="w-full resize-none rounded-lg border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-accent"
           />
         </label>
         <div class="mt-2 flex justify-end gap-2">
@@ -101,7 +101,7 @@ async function save(): Promise<void> {
           <button
             type="button"
             :disabled="saving"
-            class="h-8 rounded-lg bg-iris px-3 font-medium text-white hover:brightness-110 disabled:opacity-50"
+            class="h-8 rounded-lg bg-accent px-3 font-medium text-on-accent hover:brightness-110 disabled:opacity-50"
             @click="save"
           >
             Save rating

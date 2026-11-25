@@ -217,10 +217,10 @@ const ratingItems = (groups: { key: string; label: string; average: number; coun
       </div>
       <div v-if="preset === 'custom'" class="flex items-center gap-2">
         <label class="sr-only" for="stats-from">From</label>
-        <input id="stats-from" v-model="customFrom" type="date" class="h-9 rounded-lg border border-line bg-surface px-2.5 outline-none focus:border-iris" @change="updateCustom" />
+        <input id="stats-from" v-model="customFrom" type="date" class="h-9 rounded-lg border border-line bg-surface px-2.5 outline-none focus:border-accent" @change="updateCustom" />
         <span class="text-muted">to</span>
         <label class="sr-only" for="stats-to">To</label>
-        <input id="stats-to" v-model="customTo" type="date" class="h-9 rounded-lg border border-line bg-surface px-2.5 outline-none focus:border-iris" @change="updateCustom" />
+        <input id="stats-to" v-model="customTo" type="date" class="h-9 rounded-lg border border-line bg-surface px-2.5 outline-none focus:border-accent" @change="updateCustom" />
       </div>
       <p v-if="preset === 'custom' && customError" role="alert" class="w-full text-sm text-danger">{{ customError }}</p>
     </div>
@@ -306,7 +306,7 @@ const ratingItems = (groups: { key: string; label: string; average: number; coun
       <section aria-labelledby="quality-heading">
         <h2 id="quality-heading" class="text-lg font-semibold">Focus quality</h2>
         <p v-if="!stats.quality.ratedSessions" class="mt-1 max-w-[60ch] text-muted">
-          After a focus session ends, FocusFlow asks how focused you were. Rate a few sessions and your averages appear here.
+          After a focus session ends, Azm asks how focused you were. Rate a few sessions and your averages appear here.
         </p>
         <template v-else>
           <dl class="mt-3 grid grid-cols-2 gap-8 sm:grid-cols-3">

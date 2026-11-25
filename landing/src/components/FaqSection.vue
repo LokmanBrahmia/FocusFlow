@@ -2,23 +2,27 @@
 const faqs = [
   {
     q: 'Do I need an account or an internet connection?',
-    a: 'No. FocusFlow runs entirely on your computer and works the same with or without a connection. When you are online it checks GitHub for new versions, which you can turn off in Settings.'
+    a: 'No. Azm runs entirely on your computer and works the same with or without a connection. When you are online it checks GitHub for new versions, which you can turn off in Settings.'
+  },
+  {
+    q: 'What does the name mean?',
+    a: 'Azm (عَزم) is Arabic for resolve: the steady determination to keep going. The app used to be called FocusFlow; only the name and look changed, and your data carries over.'
   },
   {
     q: 'Where is my data stored?',
-    a: 'In one database file in your user folder: ~/.config/FocusFlow/focusflow.sqlite on Linux, and %APPDATA%\\FocusFlow\\focusflow.sqlite on Windows. Uninstalling the app does not delete it.'
+    a: 'In one database file in your user folder: ~/.config/Azm/focusflow.sqlite on Linux, and %APPDATA%\\Azm\\focusflow.sqlite on Windows. If you used Azm when it was called FocusFlow, it keeps using your existing FocusFlow folder, so nothing is lost. Uninstalling the app does not delete it.'
   },
   {
     q: 'How do I move my data to another computer?',
-    a: 'In Settings, under Your data, back up the database or export everything as JSON, then restore or import it on the other computer. FocusFlow saves a copy of the existing data before replacing it.'
+    a: 'In Settings, under Your data, back up the database or export everything as JSON, then restore or import it on the other computer. Azm saves a copy of the existing data before replacing it.'
   },
   {
     q: 'Windows warns that the installer is from an unknown publisher. Why?',
-    a: 'The installer is not code-signed yet, so Windows SmartScreen cannot identify the publisher. If you downloaded it from FocusFlow’s GitHub release, choose “More info”, then “Run anyway”.'
+    a: 'The installer is not code-signed yet, so Windows SmartScreen cannot identify the publisher. If you downloaded it from Azm’s GitHub release, choose “More info”, then “Run anyway”.'
   },
   {
     q: 'How do I update to a new version?',
-    a: 'FocusFlow tells you when a new version is out. On Windows it can download and install the update for you when you choose “Install and restart”. On Fedora and Ubuntu it links to the new package, which you install over the old one with dnf or apt. Your tasks, history and settings are always kept.'
+    a: 'Azm tells you when a new version is out. On Windows it can download and install the update for you when you choose “Install and restart”. On Fedora and Ubuntu it links to the new package, which you install over the old one with dnf or apt. Your tasks, history and settings are always kept.'
   },
   {
     q: 'Does it run on macOS or other Linux distributions?',

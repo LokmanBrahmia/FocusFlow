@@ -3,27 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>FocusFlow — Pomodoro timer and study planner for your desktop</title>
+    <title>Azm (عَزم) — Steady focus. Meaningful progress.</title>
     <meta
       name="description"
-      content="FocusFlow helps you organize your tasks, focus with Pomodoro sessions, and understand how you spend your time. Works offline on Fedora, Ubuntu and Windows; your data stays on your computer."
+      content="Azm is a calm focus timer, task manager and study planner for your desktop. Works offline on Fedora, Ubuntu and Windows; your data stays on your computer."
     />
-    <meta name="theme-color" content="#0E1016" />
+    <meta name="theme-color" content="#131517" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="FocusFlow" />
-    <meta property="og:title" content="FocusFlow — Take control of your time. Focus on what matters." />
+    <meta property="og:site_name" content="Azm" />
+    <meta property="og:title" content="Azm — Steady focus. Meaningful progress." />
     <meta
       property="og:description"
-      content="An offline Pomodoro timer, task manager and study planner for Fedora, Ubuntu and Windows."
+      content="A calm, offline focus timer, task manager and study planner for Fedora, Ubuntu and Windows."
     />
     <!--og-absolute-->
     <meta name="twitter:card" content="summary_large_image" />
 
     <script>
-      // Apply a saved theme before paint (dark is the default).
+      // Apply a saved theme before paint (dark is the default). The storage key
+      // keeps its FocusFlow-era name so returning visitors keep their choice.
       try {
         if (localStorage.getItem('focusflow-theme') === 'light') document.documentElement.classList.remove('dark')
       } catch (e) {}

@@ -22,7 +22,7 @@ const steps = [
       <h2 id="how-title" class="display text-[clamp(1.9rem,3.6vw,2.75rem)]">How it works</h2>
       <ol class="mt-10 grid gap-10 md:grid-cols-3">
         <li v-for="(s, i) in steps" :key="s.title">
-          <span class="display text-5xl text-iris" aria-hidden="true">{{ i + 1 }}</span>
+          <span class="display text-5xl text-accent" aria-hidden="true">{{ i + 1 }}</span>
           <h3 class="mt-3 text-xl font-semibold"><span class="sr-only">Step {{ i + 1 }}: </span>{{ s.title }}</h3>
           <p class="mt-2 text-muted">{{ s.body }}</p>
         </li>

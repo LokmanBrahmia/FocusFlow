@@ -4,14 +4,15 @@
 # Chromium sandbox stays enabled. Nothing is installed on the host.
 #
 # Usage: scripts/test-linux-packages.sh [docker|podman]
-# Needs: release/FocusFlow-<version>_amd64.deb and release/FocusFlow-<version>.x86_64.rpm
+# Needs: release/<productName>-<version>_amd64.deb and release/<productName>-<version>.x86_64.rpm
 set -euo pipefail
 
 ENGINE="${1:-docker}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VERSION="$(node -p "require('$ROOT/package.json').version")"
-DEB="FocusFlow-${VERSION}_amd64.deb"
-RPM="FocusFlow-${VERSION}.x86_64.rpm"
+PRODUCT="$(node -p "require('$ROOT/package.json').productName")"
+DEB="${PRODUCT}-${VERSION}_amd64.deb"
+RPM="${PRODUCT}-${VERSION}.x86_64.rpm"
 
 for f in "$DEB" "$RPM"; do
   [[ -f "$ROOT/release/$f" ]] || { echo "Missing release/$f. Run: npm run dist:linux" >&2; exit 1; }

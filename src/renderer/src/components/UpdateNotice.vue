@@ -45,8 +45,8 @@ async function copyCommand(cmd: string): Promise<void> {
     class="rounded-xl border border-line bg-surface-2/60 p-3 text-sm max-lg:hidden"
   >
     <h2 id="update-title" class="flex items-center gap-2 font-medium">
-      <ArrowUpCircle :size="16" :stroke-width="1.75" class="text-iris" aria-hidden="true" />
-      FocusFlow {{ u.version }} is available
+      <ArrowUpCircle :size="16" :stroke-width="1.75" class="text-accent" aria-hidden="true" />
+      Azm {{ u.version }} is available
     </h2>
 
     <!-- Downloading (Windows) -->
@@ -60,14 +60,14 @@ async function copyCommand(cmd: string): Promise<void> {
         aria-valuemax="100"
         aria-label="Update download"
       >
-        <div class="h-full rounded-full bg-iris transition-[width]" :style="{ width: `${status.percent}%` }" />
+        <div class="h-full rounded-full bg-accent transition-[width]" :style="{ width: `${status.percent}%` }" />
       </div>
     </template>
 
     <!-- Downloaded (Windows): install only on request -->
     <template v-else-if="status.kind === 'downloaded'">
       <p class="mt-1.5 text-muted">
-        {{ status.installOnQuit ? 'It will install when you quit FocusFlow.' : 'Ready to install. Your data is kept.' }}
+        {{ status.installOnQuit ? 'It will install when you quit Azm.' : 'Ready to install. Your data is kept.' }}
       </p>
       <div class="mt-2.5 flex flex-col gap-1.5">
         <button type="button" class="btn-primary" :disabled="store.busy" @click="installNow">
@@ -143,7 +143,7 @@ async function copyCommand(cmd: string): Promise<void> {
   <ConfirmDialog
     v-model:open="confirmOpen"
     title="Restart during a focus session?"
-    message="FocusFlow will close to install the update. Your session is saved and its timer keeps running, so it continues when FocusFlow opens again."
+    message="Azm will close to install the update. Your session is saved and its timer keeps running, so it continues when Azm opens again."
     confirm-label="Restart and install"
     @confirm="
       confirmOpen = false;
@@ -162,7 +162,7 @@ async function copyCommand(cmd: string): Promise<void> {
   justify-content: center;
   gap: 0.375rem;
   border-radius: 0.5rem;
-  background: var(--iris);
+  background: var(--accent);
   color: white;
   font-weight: 500;
 }

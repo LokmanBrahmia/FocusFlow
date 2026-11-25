@@ -3,15 +3,17 @@ withDefaults(defineProps<{ size?: number }>(), { size: 22 })
 </script>
 
 <template>
-  <!-- A session ring three quarters through: the product in one glyph. -->
+  <!--
+    The Azm mark (source: brand/azm-mark.svg): an abstract ع as one continuous
+    stroke — a small loop flowing into a wider progress arc — ending in a step dot.
+  -->
   <svg :width="size" :height="size" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <circle cx="12" cy="12" r="9" stroke="var(--line)" stroke-width="2.5" />
     <path
-      d="M12 3a9 9 0 1 1-9 9"
-      stroke="var(--iris)"
-      stroke-width="2.5"
+      d="M14.44 5.69A3.1 3.1 0 1 0 12 10.7A4.5 4.5 0 1 0 15.55 17.97"
+      stroke="var(--accent)"
+      stroke-width="2.2"
       stroke-linecap="round"
     />
-    <circle cx="12" cy="12" r="2.25" fill="var(--iris)" />
+    <circle cx="17.33" cy="15.69" r="1.35" fill="var(--text)" />
   </svg>
 </template>

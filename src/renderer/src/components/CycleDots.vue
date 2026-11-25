@@ -11,9 +11,9 @@ defineProps<{ completed: number; total: number; current: boolean }>()
       class="size-1.5 rounded-full"
       :class="
         i <= completed
-          ? 'bg-iris'
+          ? 'bg-accent'
           : i === completed + 1 && current
-            ? 'ring-1 ring-iris'
+            ? 'ring-1 ring-accent'
             : 'bg-line'
       "
     />

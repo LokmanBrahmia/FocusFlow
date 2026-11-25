@@ -26,7 +26,7 @@ const label = computed(() => {
     </div>
 
     <div class="min-w-0 flex-1">
-      <p class="text-xs" :class="timer.isBreak ? 'text-tide' : 'text-iris'">{{ label }}</p>
+      <p class="text-xs" :class="timer.isBreak ? 'text-tide' : 'text-accent'">{{ label }}</p>
       <TimerDigits :ms="timer.remainingMs" class="text-[1.9rem]" :class="s.status === 'paused' && 'text-muted'" />
       <p class="truncate text-xs text-muted">{{ s.taskTitle ?? 'Not linked to a task' }}</p>
     </div>
@@ -43,8 +43,8 @@ const label = computed(() => {
       </button>
       <button
         type="button"
-        aria-label="Open FocusFlow"
-        title="Open FocusFlow"
+        aria-label="Open Azm"
+        title="Open Azm"
         class="grid size-9 place-items-center rounded-full text-muted hover:bg-surface-2 hover:text-text"
         @click="desktop().app.showMainWindow()"
       >

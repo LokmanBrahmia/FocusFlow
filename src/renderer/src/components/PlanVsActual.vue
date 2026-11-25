@@ -21,12 +21,12 @@ const empty = computed(() => props.plannedMinutes === 0 && props.focusMinutes ==
       <div class="absolute inset-0 rounded-full bg-line/50" />
       <div
         v-if="plannedMinutes > 0"
-        class="absolute inset-y-0 left-0 rounded-full border border-dashed border-iris/70"
+        class="absolute inset-y-0 left-0 rounded-full border border-dashed border-accent/70"
         :style="{ width: pct(plannedMinutes) }"
       />
       <div
         v-if="focusMinutes > 0"
-        class="absolute inset-y-0 left-0 rounded-full bg-iris"
+        class="absolute inset-y-0 left-0 rounded-full bg-accent"
         :style="{ width: pct(focusMinutes) }"
       />
     </div>

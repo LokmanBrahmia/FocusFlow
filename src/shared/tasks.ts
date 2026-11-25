@@ -103,7 +103,7 @@ export type UpdateSubjectInput = Partial<SubjectInput>
 
 /**
  * Subject colours: a categorical palette validated for colour-blind
- * separation (adjacent ΔE ≥ 8) on both FocusFlow surfaces. The light value is
+ * separation (adjacent ΔE ≥ 8) on both Azm surfaces. The light value is
  * what is stored; the dark value is its step for the dark surface.
  */
 export const SUBJECT_PALETTE = [

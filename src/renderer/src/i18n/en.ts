@@ -14,14 +14,14 @@ export const en = {
   'settings.theme.system': 'Match system',
 
   'settings.general': 'General',
-  'settings.general.hint': 'How FocusFlow starts and closes.',
+  'settings.general.hint': 'How Azm starts and closes.',
   'settings.language': 'Language',
   'settings.language.hint': 'Arabic and French are planned.',
-  'settings.window': 'When FocusFlow opens',
+  'settings.window': 'When Azm opens',
   'settings.window.remember': 'Same size and position as last time',
   'settings.window.maximized': 'Maximised',
   'settings.window.default': 'Default size',
-  'settings.startup': 'Open FocusFlow when you log in',
+  'settings.startup': 'Open Azm when you log in',
   'settings.tray': 'Keep running in the system tray when the window is closed',
   'settings.tray.hint': 'The timer keeps going. On GNOME, tray icons need the AppIndicator extension.',
 
@@ -37,7 +37,7 @@ export const en = {
   'settings.sounds': 'Sounds',
   'settings.sounds.hint': 'Played when a session finishes.',
   'settings.notifications': 'Notifications',
-  'settings.notifications.hint': 'Desktop notifications, shown even when FocusFlow is in the background.',
+  'settings.notifications.hint': 'Desktop notifications, shown even when Azm is in the background.',
 
   'settings.data': 'Your data',
   'settings.data.hint': 'Everything stays on this computer. Keep a copy somewhere safe.',
@@ -50,7 +50,7 @@ export const en = {
   'settings.updates.hint': 'New versions are published on GitHub Releases.',
   'settings.updates.auto': 'Check for updates automatically',
   'settings.updates.auto.hint':
-    'FocusFlow asks GitHub for the latest version shortly after it starts and every few hours. No personal data is sent. This is the only time FocusFlow uses the internet.',
+    'Azm asks GitHub for the latest version shortly after it starts and every few hours. No personal data is sent. This is the only time Azm uses the internet.',
   'settings.updates.check': 'Check for updates',
 
   'settings.shortcuts': 'Keyboard shortcuts',

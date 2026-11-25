@@ -50,7 +50,7 @@ function onKey(e: KeyboardEvent): void {
 <template>
   <section aria-labelledby="preview-title" class="mx-auto max-w-6xl px-5 py-16 sm:px-8">
     <h2 id="preview-title" class="display text-[clamp(1.9rem,3.6vw,2.75rem)]">See it in use</h2>
-    <p class="mt-3 max-w-[40rem] text-lg text-muted">Every screen below is a real screenshot of FocusFlow, filled with sample data.</p>
+    <p class="mt-3 max-w-[40rem] text-lg text-muted">Every screen below is a real screenshot of Azm, filled with sample data.</p>
 
     <div role="tablist" aria-label="Screens" class="mt-8 flex flex-wrap gap-1" @keydown="onKey">
       <button

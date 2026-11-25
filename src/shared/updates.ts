@@ -2,10 +2,10 @@
  * Application updates.
  *
  * Two delivery modes, chosen per installed package format:
- * - 'install' (Windows NSIS): FocusFlow downloads the update, verifies it
+ * - 'install' (Windows NSIS): Azm downloads the update, verifies it
  *   against the SHA-512 in the release's latest.yml, and installs it only
  *   after the user clicks "Install and restart".
- * - 'manual' (Linux DEB/RPM/AppImage, development builds): FocusFlow tells
+ * - 'manual' (Linux DEB/RPM/AppImage, development builds): Azm tells
  *   the user a new version exists and links to the official release; the
  *   system package manager installs it. No root commands are run by the app.
  */
@@ -17,7 +17,7 @@ export type PackageFormat = 'nsis' | 'deb' | 'rpm' | 'appimage' | 'dev' | 'other
 
 export interface AvailableUpdate {
   version: string
-  /** Release page on GitHub (validated to belong to FocusFlow's repository). */
+  /** Release page on GitHub (validated to belong to Azm's repository). */
   releaseUrl: string
   /** Direct link to this platform's package, when the release has one. */
   assetUrl: string | null
@@ -134,7 +134,7 @@ export function releaseToUpdate(
   if (!parseVersion(version)) throw new InvalidReleaseError(`The latest release has an invalid version (${r.tag_name}).`)
 
   const base = `https://github.com/${repository}/releases/`
-  if (!r.html_url.startsWith(base)) throw new InvalidReleaseError('The release page is not on FocusFlow’s repository.')
+  if (!r.html_url.startsWith(base)) throw new InvalidReleaseError('The release page is not on Azm’s repository.')
   if (!isNewer(version, currentVersion)) return null
 
   const pattern = ASSET_PATTERNS[format]

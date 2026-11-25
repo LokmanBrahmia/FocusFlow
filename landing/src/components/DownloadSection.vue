@@ -50,7 +50,7 @@ const pageUrl = computed(() => (REPOSITORY ? releasesPage(REPOSITORY) : null))
 function unavailable(kind: PackageKind): string | null {
   switch (state.value.status) {
     case 'unconfigured':
-      return 'Downloads will appear here once FocusFlow’s GitHub repository is set up.'
+      return 'Downloads will appear here once Azm’s GitHub repository is set up.'
     case 'loading':
       return null
     case 'none':
@@ -66,7 +66,7 @@ function unavailable(kind: PackageKind): string | null {
 <template>
   <section id="download" aria-labelledby="download-title" class="border-t border-line bg-surface/50">
     <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8">
-      <h2 id="download-title" class="display text-[clamp(1.9rem,3.6vw,2.75rem)]">Download FocusFlow</h2>
+      <h2 id="download-title" class="display text-[clamp(1.9rem,3.6vw,2.75rem)]">Download Azm</h2>
       <p class="mt-3 max-w-[40rem] text-lg text-muted">
         <template v-if="release">
           Version {{ release.version }}<template v-if="release.publishedAt">, released
@@ -105,11 +105,11 @@ function unavailable(kind: PackageKind): string | null {
             <template v-else-if="release && release.assets[p.kind]">
               <a
                 :href="release.assets[p.kind]!.url"
-                class="flex h-11 items-center justify-center gap-2 rounded-xl bg-iris font-medium text-white transition-[filter] hover:brightness-110"
-                :aria-label="`Download FocusFlow ${release.version} for ${p.os} (${p.format})`"
+                class="flex h-11 items-center justify-center gap-2 rounded-xl bg-accent font-medium text-on-accent transition-[filter] hover:brightness-110"
+                :aria-label="`Download Azm ${release.version} for ${p.os} (${p.format})`"
               >
                 <Download :size="17" :stroke-width="2" /> Download
-                <span class="font-normal text-white/75">{{ formatSize(release.assets[p.kind]!.size) }}</span>
+                <span class="font-normal text-on-accent/70">{{ formatSize(release.assets[p.kind]!.size) }}</span>
               </a>
             </template>
 
@@ -121,7 +121,7 @@ function unavailable(kind: PackageKind): string | null {
               <a
                 v-if="pageUrl && state.status !== 'none'"
                 :href="release?.url ?? pageUrl"
-                class="mt-3 inline-flex items-center gap-1.5 text-sm text-iris hover:underline"
+                class="mt-3 inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
               >
                 See releases on GitHub <ExternalLink :size="13" />
               </a>

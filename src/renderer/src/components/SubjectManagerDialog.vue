@@ -101,7 +101,7 @@ async function confirmDelete(): Promise<void> {
             autofocus
             :maxlength="MAX_SUBJECT_NAME"
             aria-label="Subject name"
-            class="h-9 rounded-lg border border-line bg-bg px-3 outline-none focus:border-iris"
+            class="h-9 rounded-lg border border-line bg-bg px-3 outline-none focus:border-accent"
           />
           <div class="flex items-center justify-between gap-3">
             <div role="radiogroup" aria-label="Colour" class="flex gap-1.5">
@@ -120,7 +120,7 @@ async function confirmDelete(): Promise<void> {
             </div>
             <div class="flex gap-2">
               <button type="button" class="h-8 rounded-lg px-3 text-muted hover:bg-surface-2" @click="cancelEdit">Cancel</button>
-              <button type="submit" class="h-8 rounded-lg bg-iris px-3 font-medium text-white">Save</button>
+              <button type="submit" class="h-8 rounded-lg bg-accent px-3 font-medium text-on-accent">Save</button>
             </div>
           </div>
           <p v-if="error" role="alert" class="text-sm text-danger">{{ error }}</p>
@@ -161,7 +161,7 @@ async function confirmDelete(): Promise<void> {
         :maxlength="MAX_SUBJECT_NAME"
         placeholder="Computer Networks"
         aria-label="Subject name"
-        class="h-9 rounded-lg border border-line bg-bg px-3 outline-none focus:border-iris"
+        class="h-9 rounded-lg border border-line bg-bg px-3 outline-none focus:border-accent"
       />
       <div class="flex items-center justify-between gap-3">
         <div role="radiogroup" aria-label="Colour" class="flex gap-1.5">
@@ -180,7 +180,7 @@ async function confirmDelete(): Promise<void> {
         </div>
         <div class="flex gap-2">
           <button type="button" class="h-8 rounded-lg px-3 text-muted hover:bg-surface-2" @click="cancelEdit">Cancel</button>
-          <button type="submit" class="h-8 rounded-lg bg-iris px-3 font-medium text-white">Add subject</button>
+          <button type="submit" class="h-8 rounded-lg bg-accent px-3 font-medium text-on-accent">Add subject</button>
         </div>
       </div>
       <p v-if="error" role="alert" class="text-sm text-danger">{{ error }}</p>
@@ -209,7 +209,7 @@ async function confirmDelete(): Promise<void> {
   >
     <label v-if="pendingDelete?.taskCount" class="mt-4 flex flex-col gap-1.5">
       <span class="text-sm text-muted">Move its tasks to</span>
-      <select v-model="reassignTo" class="h-9 rounded-lg border border-line bg-bg px-3 outline-none focus:border-iris">
+      <select v-model="reassignTo" class="h-9 rounded-lg border border-line bg-bg px-3 outline-none focus:border-accent">
         <option value="">No subject</option>
         <option v-for="o in otherSubjects" :key="o.id" :value="o.id">{{ o.name }}</option>
       </select>

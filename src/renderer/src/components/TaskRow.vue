@@ -37,13 +37,13 @@ const overdue = computed(() => !!props.task.deadline && !closed.value && isPast(
         done
           ? 'border-moss bg-moss text-bg'
           : task.status === 'in_progress'
-            ? 'border-iris hover:bg-iris-soft'
+            ? 'border-accent hover:bg-accent-soft'
             : 'border-faint hover:border-text'
       "
       @click="actions.toggleComplete(task)"
     >
       <Check v-if="done" :size="13" :stroke-width="3" />
-      <span v-else-if="task.status === 'in_progress'" class="size-2 rounded-full bg-iris" />
+      <span v-else-if="task.status === 'in_progress'" class="size-2 rounded-full bg-accent" />
     </button>
 
     <div class="min-w-0 flex-1">
@@ -68,7 +68,7 @@ const overdue = computed(() => !!props.task.deadline && !closed.value && isPast(
           <span class="relative h-1 w-14 overflow-hidden rounded-full bg-line" aria-hidden="true">
             <span
               class="absolute inset-y-0 left-0 rounded-full"
-              :class="(progress ?? 0) >= 1 ? 'bg-moss' : 'bg-iris'"
+              :class="(progress ?? 0) >= 1 ? 'bg-moss' : 'bg-accent'"
               :style="{ width: `${Math.min(1, progress ?? 0) * 100}%` }"
             />
           </span>
@@ -88,7 +88,7 @@ const overdue = computed(() => !!props.task.deadline && !closed.value && isPast(
         type="button"
         :aria-label="`Focus on ${task.title}`"
         title="Focus on this task"
-        class="grid size-8 place-items-center rounded-lg text-iris hover:bg-iris-soft"
+        class="grid size-8 place-items-center rounded-lg text-accent hover:bg-accent-soft"
         @click="actions.focusOn(task)"
       >
         <Play :size="15" :stroke-width="2" />

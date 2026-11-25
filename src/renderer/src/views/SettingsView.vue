@@ -15,6 +15,8 @@ import { desktop } from '@/services/desktop'
 import { SOUND_OPTIONS, playSound } from '@/services/sounds'
 import { LANGUAGES, useI18n } from '@/i18n'
 import { useUpdateStore } from '@/stores/updates'
+import { BRAND } from '@shared/brand'
+import BrandMark from '@/components/BrandMark.vue'
 import { RefreshCw } from '@lucide/vue'
 
 const settingsStore = useSettingsStore()
@@ -91,17 +93,17 @@ const updateLine = computed(() => {
 const updateHow = computed(() => {
   switch (updates.state?.format) {
     case 'nsis':
-      return 'On Windows, FocusFlow downloads the new installer, checks it against the release’s checksum, and installs it when you choose “Install and restart” (or when you quit, if you prefer).'
+      return 'On Windows, Azm downloads the new installer, checks it against the release’s checksum, and installs it when you choose “Install and restart” (or when you quit, if you prefer).'
     case 'rpm':
-      return 'This copy was installed from an RPM package. FocusFlow tells you when a new version is out and links to it; install it with “sudo dnf install ./<file>.rpm”. FocusFlow never runs administrator commands itself.'
+      return 'This copy was installed from an RPM package. Azm tells you when a new version is out and links to it; install it with “sudo dnf install ./<file>.rpm”. Azm never runs administrator commands itself.'
     case 'deb':
-      return 'This copy was installed from a DEB package. FocusFlow tells you when a new version is out and links to it; install it with “sudo apt install ./<file>.deb”. FocusFlow never runs administrator commands itself.'
+      return 'This copy was installed from a DEB package. Azm tells you when a new version is out and links to it; install it with “sudo apt install ./<file>.deb”. Azm never runs administrator commands itself.'
     case 'appimage':
-      return 'AppImages are not part of FocusFlow releases. FocusFlow tells you when a new version is out; install the DEB or RPM from the release page.'
+      return 'AppImages are not part of Azm releases. Azm tells you when a new version is out; install the DEB or RPM from the release page.'
     case 'dev':
       return 'This is a development build. It can check for new versions, but updates are installed by building from source.'
     default:
-      return 'FocusFlow tells you when a new version is out and links to the release page.'
+      return 'Azm tells you when a new version is out and links to the release page.'
   }
 })
 
@@ -133,7 +135,7 @@ const sounds = [
   { label: 'After a break', model: breakSound }
 ]
 
-const selectClass = 'h-9 rounded-lg border border-line bg-surface px-2.5 outline-none focus:border-iris'
+const selectClass = 'h-9 rounded-lg border border-line bg-surface px-2.5 outline-none focus:border-accent'
 
 // ── data ────────────────────────────────────────────────────────────────────
 const busy = ref<string | null>(null)
@@ -379,7 +381,7 @@ onMounted(async () => {
         <div class="flex max-w-lg flex-col gap-4">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <p>
-              <span class="block">FocusFlow {{ updates.state?.currentVersion ?? '' }}</span>
+              <span class="block">Azm {{ updates.state?.currentVersion ?? '' }}</span>
               <span class="block text-sm" :class="updates.state?.status.kind === 'error' ? 'text-danger' : 'text-muted'" aria-live="polite">{{ updateLine }}</span>
             </p>
             <button
@@ -417,6 +419,17 @@ onMounted(async () => {
         </div>
         <p v-if="infoError" role="alert" class="text-danger">{{ infoError }}</p>
         <div v-else-if="info">
+          <div class="mb-6 flex items-start gap-3">
+            <BrandMark :size="36" />
+            <div>
+              <p class="flex items-baseline gap-2">
+                <span class="text-xl font-medium tracking-tight">{{ BRAND.name }}</span>
+                <span lang="ar" dir="rtl" class="text-lg text-muted">{{ BRAND.nameAr }}</span>
+              </p>
+              <p class="text-muted">{{ BRAND.tagline }}</p>
+              <p lang="ar" dir="rtl" class="w-fit text-muted">{{ BRAND.taglineAr }}</p>
+            </div>
+          </div>
           <dl class="grid grid-cols-[9rem_1fr] gap-y-2.5">
             <dt class="text-muted">Version</dt>
             <dd>{{ info.version }}</dd>

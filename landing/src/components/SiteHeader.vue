@@ -23,11 +23,12 @@ function toggleTheme(): void {
 </script>
 
 <template>
-  <header class="sticky top-0 z-30 border-b border-line/70 bg-bg/85 backdrop-blur">
+  <header class="sticky top-0 z-30 border-b border-line/70 bg-bg">
     <div class="mx-auto flex h-16 max-w-6xl items-center gap-6 px-5 sm:px-8">
-      <a href="#top" class="flex items-center gap-2.5" aria-label="FocusFlow home">
+      <a href="#top" class="flex items-center gap-2.5" aria-label="Azm home">
         <BrandMark />
-        <span class="display text-xl">FocusFlow</span>
+        <span class="text-xl font-medium tracking-tight">Azm</span>
+        <span lang="ar" dir="rtl" class="text-lg text-muted">عَزم</span>
       </a>
 
       <nav aria-label="Sections" class="ml-auto hidden items-center gap-1 md:flex">
@@ -52,7 +53,7 @@ function toggleTheme(): void {
         </button>
         <a
           href="#download"
-          class="inline-flex h-9 items-center gap-2 rounded-lg bg-iris px-3.5 font-medium text-white transition-[filter] hover:brightness-110"
+          class="inline-flex h-9 items-center gap-2 rounded-lg bg-accent px-3.5 font-medium text-on-accent transition-[filter] hover:brightness-110"
         >
           <Download :size="16" :stroke-width="2" /> Download
         </a>

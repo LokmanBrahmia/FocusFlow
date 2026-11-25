@@ -1,44 +1,48 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/fraunces';
-@import '@fontsource-variable/schibsted-grotesk';
+@import '@fontsource-variable/ibm-plex-sans';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-400.css';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-500.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * FocusFlow tokens.
- * Dark is the default: a blue-leaning ink, not neutral black, so long
- * evening sessions feel like a desk lamp rather than a terminal.
- * Iris marks focus; tide is reserved for breaks so the two never blur.
+ * Azm — "Calm Systems" tokens.
+ * Dark is the default: a neutral deep charcoal, soft-white and grey text,
+ * and one muted mint accent kept for what matters (active state, progress,
+ * the primary action). Breaks use a dusty blue so focus and rest never blur.
+ * Light mode is the same system on a pale neutral ground.
  */
 :root {
-  --bg: #f4f5f8;
+  --bg: #f4f5f4;
   --surface: #ffffff;
-  --surface-2: #eceff4;
-  --line: #dde1e8;
-  --text: #151821;
-  --muted: #5b6270;
-  --faint: #8a91a0;
-  --iris: #5a3fe0;
-  --iris-soft: #ece8ff;
-  --tide: #0b86b8;
-  --moss: #138a55;
-  --danger: #c4323f;
+  --surface-2: #ebeeec;
+  --line: #d9dfdb;
+  --text: #191d1b;
+  --muted: #58605c;
+  --faint: #79827d;
+  --accent: #2b7a5b;
+  --accent-soft: #e2f0e9;
+  --on-accent: #ffffff;
+  --tide: #3d6a99;
+  --moss: #2b7a5b;
+  --danger: #b83a2e;
   color-scheme: light;
 }
 
 :root.dark {
-  --bg: #0e1016;
-  --surface: #151922;
-  --surface-2: #1c212c;
-  --line: #262c39;
-  --text: #eceef3;
-  --muted: #9aa1af;
-  --faint: #687080;
-  --iris: #8f7bff;
-  --iris-soft: #221d3d;
-  --tide: #5cc8f0;
-  --moss: #3ecf8e;
-  --danger: #f0717a;
+  --bg: #131517;
+  --surface: #191c1f;
+  --surface-2: #202427;
+  --line: #2b3034;
+  --text: #e6e9e7;
+  --muted: #9aa3a0;
+  --faint: #737b78;
+  --accent: #8ccfb0;
+  --accent-soft: #1c2a24;
+  --on-accent: #0f1a15;
+  --tide: #9db6d3;
+  --moss: #8ccfb0;
+  --danger: #e0897b;
   color-scheme: dark;
 }
 
@@ -50,14 +54,16 @@
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-faint: var(--faint);
-  --color-iris: var(--iris);
-  --color-iris-soft: var(--iris-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
   --color-tide: var(--tide);
   --color-moss: var(--moss);
   --color-danger: var(--danger);
 
-  --font-sans: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'Fraunces Variable', ui-serif, Georgia, serif;
+  /* One family for both scripts: IBM Plex Sans (Latin) + IBM Plex Sans Arabic. */
+  --font-sans: 'IBM Plex Sans Variable', 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', 'IBM Plex Sans Variable', ui-sans-serif, sans-serif;
 
   /* Modular scale, ratio 1.25 from a 14px desktop body size. */
   --text-xs: 0.75rem;
@@ -75,7 +81,7 @@
   --text-3xl: 2.14rem;
   --text-3xl--line-height: 2.5rem;
   --text-4xl: 2.67rem;
-  --text-4xl--line-height: 3rem;
+  --text-4xl--line-height: 3.1rem;
 }
 
 @layer base {
@@ -92,7 +98,6 @@
     font-size: var(--text-base);
     line-height: var(--text-base--line-height);
     -webkit-font-smoothing: antialiased;
-    font-feature-settings: 'ss01';
     user-select: none;
   }
 
@@ -104,17 +109,23 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--iris);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
     border-radius: 6px;
   }
 
   ::selection {
-    background: var(--iris-soft);
+    background: var(--accent-soft);
   }
 
   kbd {
     font-family: var(--font-sans);
+  }
+
+  /* Arabic runs (the name عَزم, taglines) get the Arabic face and room for diacritics. */
+  :lang(ar) {
+    font-family: var(--font-arabic);
+    line-height: 1.6;
   }
 }
 
@@ -127,15 +138,11 @@
   }
 }
 
-/* Page title: Fraunces at display optical size, softened. */
+/* Page titles: light weight and tight tracking — precise, unhurried. */
 .page-title {
-  font-family: var(--font-serif);
-  font-variation-settings:
-    'opsz' 72,
-    'SOFT' 60,
-    'WONK' 0;
-  font-weight: 420;
-  letter-spacing: -0.015em;
+  font-family: var(--font-sans);
+  font-weight: 330;
+  letter-spacing: -0.022em;
 }
 
 .route-enter-active {

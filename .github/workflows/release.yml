@@ -1,4 +1,4 @@
-# Builds FocusFlow for Fedora (RPM), Ubuntu (DEB) and Windows (NSIS EXE).
+# Builds Azm (formerly FocusFlow) for Fedora (RPM), Ubuntu (DEB) and Windows (NSIS EXE).
 #
 # - Manual run (Actions → Release → Run workflow): checks, tests, builds and
 #   uploads the packages as workflow artifacts. Nothing is released.
@@ -112,7 +112,7 @@ jobs:
         shell: pwsh
         run: |
           # electron-updater reads latest.yml from the release and app-update.yml from the app.
-          $installer = Get-ChildItem release -Filter 'FocusFlow-Setup-*.exe' | Select-Object -First 1
+          $installer = Get-ChildItem release -Filter 'Azm-Setup-*.exe' | Select-Object -First 1
           $latest = Get-Content release/latest.yml -Raw
           Write-Host $latest
           if ($latest -notmatch "path: $([regex]::Escape($installer.Name))") { throw 'latest.yml does not point at the installer' }
@@ -125,14 +125,14 @@ jobs:
       - name: Install silently, then smoke-test the installed app
         shell: pwsh
         run: |
-          $installer = Get-ChildItem release -Filter 'FocusFlow-Setup-*.exe' | Select-Object -First 1
+          $installer = Get-ChildItem release -Filter 'Azm-Setup-*.exe' | Select-Object -First 1
           if (-not $installer) { throw 'Installer not found' }
           $p = Start-Process -FilePath $installer.FullName -ArgumentList '/S' -Wait -PassThru
           if ($p.ExitCode -ne 0) { throw "Installer exited with $($p.ExitCode)" }
           # Per-user NSIS installs go under %LOCALAPPDATA%\Programs.
-          $exe = Get-ChildItem (Join-Path $env:LOCALAPPDATA 'Programs') -Recurse -Filter 'FocusFlow.exe' -ErrorAction SilentlyContinue |
+          $exe = Get-ChildItem (Join-Path $env:LOCALAPPDATA 'Programs') -Recurse -Filter 'Azm.exe' -ErrorAction SilentlyContinue |
             Select-Object -First 1 -ExpandProperty FullName
-          if (-not $exe) { throw 'Installed FocusFlow.exe not found under %LOCALAPPDATA%\Programs' }
+          if (-not $exe) { throw 'Installed Azm.exe not found under %LOCALAPPDATA%\Programs' }
           Write-Host "Installed at $exe"
           $env:FOCUSFLOW_SMOKE_REPORT = Join-Path $env:RUNNER_TEMP 'smoke.json'
           $run = Start-Process -FilePath $exe -ArgumentList '--smoke-test' -Wait -PassThru
@@ -143,8 +143,8 @@ jobs:
           name: focusflow-windows
           # The installer plus the files electron-updater needs for in-app updates.
           path: |
-            release/FocusFlow-Setup-*.exe
-            release/FocusFlow-Setup-*.exe.blockmap
+            release/Azm-Setup-*.exe
+            release/Azm-Setup-*.exe.blockmap
             release/latest.yml
           if-no-files-found: error
           retention-days: 14
@@ -169,7 +169,7 @@ jobs:
           PRERELEASE: ${{ needs.verify.outputs.prerelease }}
         run: |
           ls -l packages
-          flags=(--draft --verify-tag --generate-notes --title "FocusFlow $VERSION")
+          flags=(--draft --verify-tag --generate-notes --title "Azm $VERSION")
           if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
           # latest.yml + .blockmap let installed Windows copies update in-app.
           # Linux updates are announced from the release itself (no extra files).

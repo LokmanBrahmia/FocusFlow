@@ -49,7 +49,7 @@ const nowY = computed(() =>
 )
 
 function color(b: TimeBlock): string {
-  return subjectColor(b.subjectId ? subjects.byId.get(b.subjectId)?.color : null, 'var(--iris)')
+  return subjectColor(b.subjectId ? subjects.byId.get(b.subjectId)?.color : null, 'var(--accent)')
 }
 
 function onLaneClick(e: MouseEvent): void {
@@ -66,10 +66,10 @@ function onLaneClick(e: MouseEvent): void {
     <div class="grid grid-cols-[3rem_1fr_1fr] gap-x-2 pb-2 text-sm text-muted">
       <span />
       <span class="flex items-center gap-2">
-        <span class="h-2.5 w-4 rounded-sm border border-dashed border-iris" aria-hidden="true" /> Planned
+        <span class="h-2.5 w-4 rounded-sm border border-dashed border-accent" aria-hidden="true" /> Planned
       </span>
       <span class="flex items-center gap-2">
-        <span class="h-2.5 w-4 rounded-sm bg-iris" aria-hidden="true" /> Focused
+        <span class="h-2.5 w-4 rounded-sm bg-accent" aria-hidden="true" /> Focused
       </span>
     </div>
 
@@ -124,12 +124,12 @@ function onLaneClick(e: MouseEvent): void {
           v-for="s in sessions"
           :key="s.id"
           role="listitem"
-          class="absolute inset-x-0 overflow-hidden rounded-md bg-iris px-2.5 py-px text-sm text-white"
+          class="absolute inset-x-0 overflow-hidden rounded-md bg-accent px-2.5 py-px text-sm text-on-accent"
           :style="{ top: `${y(s.start)}px`, height: `${Math.max(6, y(s.end) - y(s.start) - 2)}px` }"
           :title="`${s.taskTitle ?? 'Focus'}: ${format(new Date(s.startedAt), 'HH:mm')}, ${formatMinutes(s.seconds / 60)}`"
         >
           <span v-if="y(s.end) - y(s.start) > 16" class="block truncate text-xs leading-4">{{ s.taskTitle ?? 'Focus session' }}</span>
-          <span v-if="y(s.end) - y(s.start) > 44" class="block text-xs text-white/75">{{ formatMinutes(s.seconds / 60) }}</span>
+          <span v-if="y(s.end) - y(s.start) > 44" class="block text-xs text-on-accent/75">{{ formatMinutes(s.seconds / 60) }}</span>
         </div>
       </div>
 

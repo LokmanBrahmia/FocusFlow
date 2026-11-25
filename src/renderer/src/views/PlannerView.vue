@@ -185,7 +185,7 @@ const goalMinutes = computed(() => settings.settings.dailyGoalMinutes)
               v-if="unplanned.length"
               v-model="planPick"
               aria-label="Plan an existing task for this day"
-              class="h-9 rounded-lg border border-line bg-surface px-2.5 text-muted outline-none focus:border-iris"
+              class="h-9 rounded-lg border border-line bg-surface px-2.5 text-muted outline-none focus:border-accent"
               @change="planExisting"
             >
               <option value="">Plan an existing task…</option>

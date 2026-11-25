@@ -1,9 +1,9 @@
 {
-  "name": "focusflow-landing",
+  "name": "azm-landing",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "Static landing page for FocusFlow (deployed to Cloudflare Pages)",
+  "description": "Static landing page for Azm (عَزم), hosted on Netlify",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -11,8 +11,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@fontsource-variable/fraunces": "^5.3.0",
-    "@fontsource-variable/schibsted-grotesk": "^5.3.0",
+    "@fontsource-variable/ibm-plex-sans": "^5.3.0",
+    "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
     "@lucide/vue": "^1.80.0",
     "vue": "^3.5.46"
   },

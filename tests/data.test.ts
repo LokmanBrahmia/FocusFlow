@@ -63,7 +63,7 @@ describe('export and import', () => {
   })
 
   it('rejects files that are not FocusFlow exports', () => {
-    expect(() => stageImport({ hello: 'world' })).toThrow(/not a FocusFlow export/)
+    expect(() => stageImport({ hello: 'world' })).toThrow(/not an Azm export/)
     expect(() => stageImport(null)).toThrow(InputError)
     expect(() => stageImport({ format: 'focusflow-export', version: 99, data: {} })).toThrow(/newer version/)
   })
@@ -125,14 +125,14 @@ describe('backup and restore', () => {
   it('rejects files that are not FocusFlow databases', () => {
     const junk = join(dir, 'junk.sqlite')
     writeFileSync(junk, 'not a database at all')
-    expect(() => stageRestore(junk, join(dir, 'work.sqlite'))).toThrow(/not a FocusFlow backup/)
+    expect(() => stageRestore(junk, join(dir, 'work.sqlite'))).toThrow(/not an Azm backup/)
     expect(existsSync(join(dir, 'work.sqlite'))).toBe(false)
 
     const plain = join(dir, 'plain.sqlite')
     const p = new Database(plain)
     p.exec('CREATE TABLE x (a)')
     p.close()
-    expect(() => stageRestore(plain, join(dir, 'work2.sqlite'))).toThrow(/not a FocusFlow backup/)
+    expect(() => stageRestore(plain, join(dir, 'work2.sqlite'))).toThrow(/not an Azm backup/)
   })
 
   it('replaceAll is atomic: a failure keeps the existing data', () => {

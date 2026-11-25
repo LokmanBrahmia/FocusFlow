@@ -64,17 +64,17 @@ export function exportData(db: DB, appVersion: string, now = new Date()): Export
  * database is not touched. Returns the staging database on success.
  */
 export function stageImport(raw: unknown): { db: DB; skippedSettings: number; exportedAt: string | null } {
-  if (typeof raw !== 'object' || raw === null) throw new InputError('This is not a FocusFlow export file.')
+  if (typeof raw !== 'object' || raw === null) throw new InputError('This is not an Azm export file.')
   const file = raw as Partial<ExportFile>
   if (file.format !== EXPORT_FORMAT || typeof file.data !== 'object' || file.data === null) {
-    throw new InputError('This is not a FocusFlow export file.')
+    throw new InputError('This is not an Azm export file.')
   }
   if (typeof file.version !== 'number' || file.version > EXPORT_VERSION) {
-    throw new InputError('This file was made by a newer version of FocusFlow. Update the app to import it.')
+    throw new InputError('This file was made by a newer version of Azm. Update the app to import it.')
   }
   const latest = MIGRATIONS[MIGRATIONS.length - 1].version
   if (typeof file.schemaVersion === 'number' && file.schemaVersion > latest) {
-    throw new InputError('This file was made by a newer version of FocusFlow. Update the app to import it.')
+    throw new InputError('This file was made by a newer version of Azm. Update the app to import it.')
   }
 
   const db = openDatabase(':memory:')
@@ -140,7 +140,7 @@ export async function backupTo(db: DB, destination: string): Promise<void> {
 
 /**
  * Opens a private copy of a backup file, checks that it is a healthy
- * FocusFlow database and migrates the copy to the current schema. The
+ * Azm database and migrates the copy to the current schema. The
  * chosen file itself is never modified.
  */
 export function stageRestore(source: string, workingCopy: string): DB {
@@ -152,10 +152,10 @@ export function stageRestore(source: string, workingCopy: string): DB {
     const ok = db.pragma('integrity_check', { simple: true })
     if (ok !== 'ok') throw new InputError('This backup is damaged and cannot be restored.')
     const hasMigrations = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'schema_migrations'").get()
-    if (!hasMigrations) throw new InputError('This file is not a FocusFlow backup.')
+    if (!hasMigrations) throw new InputError('This file is not an Azm backup.')
     const latest = MIGRATIONS[MIGRATIONS.length - 1].version
     if (getSchemaVersion(db) > latest) {
-      throw new InputError('This backup was made by a newer version of FocusFlow. Update the app to restore it.')
+      throw new InputError('This backup was made by a newer version of Azm. Update the app to restore it.')
     }
     runMigrations(db)
     return db
@@ -163,7 +163,7 @@ export function stageRestore(source: string, workingCopy: string): DB {
     db?.close()
     rmSync(workingCopy, { force: true })
     if (err instanceof InputError) throw err
-    throw new InputError('This file is not a FocusFlow backup.')
+    throw new InputError('This file is not an Azm backup.')
   }
 }
 

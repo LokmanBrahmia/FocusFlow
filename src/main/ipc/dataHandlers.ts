@@ -75,23 +75,23 @@ export function registerDataHandlers(deps: DataDeps): void {
   }
 
   handle(ctx, IPC.dataExport, async (): Promise<FileResult> => {
-    const path = await saveDialog('Export FocusFlow data', `focusflow-export-${stamp()}.json`, 'json', 'FocusFlow export')
+    const path = await saveDialog('Export Azm data', `azm-export-${stamp()}.json`, 'json', 'Azm export')
     if (!path) return { saved: false }
     writeFileSync(path, JSON.stringify(exportData(deps.db, deps.appVersion), null, 2), 'utf8')
     return { saved: true, path }
   })
 
   handle(ctx, IPC.dataBackup, async (): Promise<FileResult> => {
-    const path = await saveDialog('Back up FocusFlow', `focusflow-backup-${stamp()}.sqlite`, 'sqlite', 'FocusFlow backup')
+    const path = await saveDialog('Back up Azm', `azm-backup-${stamp()}.sqlite`, 'sqlite', 'Azm backup')
     if (!path) return { saved: false }
     await backupTo(deps.db, path)
     return { saved: true, path }
   })
 
   handle(ctx, IPC.dataPrepareImport, async (): Promise<ReplacePreview | null> => {
-    const path = await openDialog('Import FocusFlow data', ['json'], 'FocusFlow export')
+    const path = await openDialog('Import Azm data', ['json'], 'Azm export')
     if (!path) return null
-    if (statSync(path).size > MAX_IMPORT_BYTES) throw new InputError('This file is too large to be a FocusFlow export.')
+    if (statSync(path).size > MAX_IMPORT_BYTES) throw new InputError('This file is too large to be an Azm export.')
     let parsed: unknown
     try {
       parsed = JSON.parse(readFileSync(path, 'utf8'))
@@ -114,7 +114,7 @@ export function registerDataHandlers(deps: DataDeps): void {
   })
 
   handle(ctx, IPC.dataPrepareRestore, async (): Promise<ReplacePreview | null> => {
-    const path = await openDialog('Restore a FocusFlow backup', ['sqlite', 'db'], 'FocusFlow backup')
+    const path = await openDialog('Restore an Azm backup', ['sqlite', 'db'], 'Azm backup')
     if (!path) return null
     mkdirSync(backupsDir, { recursive: true })
     const workingCopy = join(backupsDir, `.restore-${randomUUID()}.sqlite`)

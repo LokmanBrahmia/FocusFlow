@@ -9,7 +9,8 @@ import { LICENSE_NOTE, REPOSITORY_URL } from '../site'
     <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-4 px-5 py-10 text-sm text-muted sm:px-8">
       <span class="flex items-center gap-2 text-text">
         <BrandMark :size="20" />
-        <span class="display text-lg">FocusFlow</span>
+        <span class="text-lg font-medium tracking-tight">Azm</span>
+        <span lang="ar" dir="rtl" class="text-muted">عَزم</span>
       </span>
       <a v-if="REPOSITORY_URL" :href="REPOSITORY_URL" class="inline-flex items-center gap-1.5 hover:text-text">
         Source code on GitHub <ExternalLink :size="13" />

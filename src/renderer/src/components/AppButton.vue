@@ -21,7 +21,7 @@ withDefaults(
     class="inline-flex h-9 items-center gap-2 rounded-lg px-3.5 text-base font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
     :class="
       variant === 'primary'
-        ? 'bg-iris text-white hover:brightness-110'
+        ? 'bg-accent text-on-accent hover:brightness-110'
         : 'border border-line bg-surface text-text hover:bg-surface-2'
     "
   >

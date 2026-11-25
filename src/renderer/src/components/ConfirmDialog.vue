@@ -24,8 +24,8 @@ const open = defineModel<boolean>('open', { required: true })
       </button>
       <button
         type="button"
-        class="h-9 rounded-lg px-3.5 font-medium text-white hover:brightness-110"
-        :class="danger ? 'bg-danger' : 'bg-iris'"
+        class="h-9 rounded-lg px-3.5 font-medium hover:brightness-110"
+        :class="danger ? 'bg-danger text-white' : 'bg-accent text-on-accent'"
         @click="emit('confirm')"
       >
         {{ confirmLabel }}

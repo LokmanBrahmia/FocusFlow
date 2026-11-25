@@ -1,4 +1,8 @@
-# Distributing FocusFlow
+# Distributing Azm
+
+Azm (عَزم) was called FocusFlow up to version 0.2.0. The section
+[Publishing the Azm rename](#publishing-the-azm-rename) lists the one-time steps for the first
+Azm release.
 
 This is the complete path from source code to downloads on the website:
 
@@ -20,9 +24,9 @@ package.json version ──► git tag vX.Y.Z ──► GitHub Actions ──►
 
 | Target | File | Built on | Install |
 | --- | --- | --- | --- |
-| Fedora / RHEL family | `FocusFlow-<version>.x86_64.rpm` | Linux | `sudo dnf install ./FocusFlow-<version>.x86_64.rpm` |
-| Ubuntu / Debian family | `FocusFlow-<version>_amd64.deb` | Linux | `sudo apt install ./FocusFlow-<version>_amd64.deb` |
-| Windows 10/11 x64 | `FocusFlow-Setup-<version>.exe` | Windows | Run the installer (per-user, no admin rights) |
+| Fedora / RHEL family | `Azm-<version>.x86_64.rpm` | Linux | `sudo dnf install ./Azm-<version>.x86_64.rpm` |
+| Ubuntu / Debian family | `Azm-<version>_amd64.deb` | Linux | `sudo apt install ./Azm-<version>_amd64.deb` |
+| Windows 10/11 x64 | `Azm-Setup-<version>.exe` | Windows | Run the installer (per-user, no admin rights) |
 
 ### Minimum supported systems
 
@@ -37,10 +41,12 @@ Windows SmartScreen shows "unknown publisher". The website's FAQ explains this t
 
 ### What the packages contain
 
-- The app runs from `/opt/FocusFlow` (Linux) or `%LOCALAPPDATA%\Programs\FocusFlow` (Windows) and
-  never writes there.
-- User data lives in the user data directory (`~/.config/FocusFlow`, `%APPDATA%\FocusFlow`).
-  Upgrading or uninstalling keeps it.
+- The app runs from `/opt/Azm` (Linux) or `%LOCALAPPDATA%\Programs\Azm` (Windows) and never
+  writes there. The Linux package is still named `focusflow` and the command is still
+  `focusflow`, so the package manager treats Azm as an upgrade of FocusFlow.
+- User data lives in the user data directory (`~/.config/Azm`, `%APPDATA%\Azm`). An existing
+  `FocusFlow` folder with a database is used instead until the Azm folder has one, so upgrading
+  from FocusFlow keeps everything. Upgrading or uninstalling never deletes it.
 - **Native module:** better-sqlite3 13 ships N-API prebuilt binaries. One binary works in Node and
   every Electron version, so there is no ABI rebuild (`npmRebuild: false`).
   `npm run verify:native` proves it loads under both runtimes. Each package includes only its own
@@ -140,10 +146,10 @@ are no secrets to configure.
 2. Download the artifacts and try them on real machines if you can: install the RPM on Fedora,
    the DEB on Ubuntu and the EXE on Windows, and check the app opens and keeps data after a restart.
 3. Open **Releases**, open the draft `vX.Y.Z` and check it has these five files:
-   - `FocusFlow-X.Y.Z.x86_64.rpm`
-   - `FocusFlow-X.Y.Z_amd64.deb`
-   - `FocusFlow-Setup-X.Y.Z.exe`
-   - `FocusFlow-Setup-X.Y.Z.exe.blockmap` (Windows in-app updates)
+   - `Azm-X.Y.Z.x86_64.rpm`
+   - `Azm-X.Y.Z_amd64.deb`
+   - `Azm-Setup-X.Y.Z.exe`
+   - `Azm-Setup-X.Y.Z.exe.blockmap` (Windows in-app updates)
    - `latest.yml` (Windows in-app updates; it names the EXE and its SHA-512)
 
    Don't rename, delete or re-upload these files by hand. `latest.yml` must match the EXE
@@ -230,7 +236,7 @@ Build & deploy → Link repository → GitHub → LokmanBrahmia/FocusFlow**. The
 
 On the free plan Netlify injects an HTML comment and a `/.netlify/scripts/hud` script into the
 page. The site's CSP blocks that script's inline code, which shows as one console message. It is
-Netlify's toolbar, not FocusFlow code, and the page works normally.
+Netlify's toolbar, not Azm code, and the page works normally.
 
 ### Alternative: Cloudflare Pages (free plan)
 
@@ -282,6 +288,36 @@ npm test                            # release/asset matching tests
 npm run build                       # production build to landing/dist
 node scripts/serve-dist.mjs 4173    # serve dist/ with _headers applied, like Cloudflare
 ```
+
+## Publishing the Azm rename
+
+The rename is done in the source only. Nothing was pushed, tagged, released or deployed. To ship it:
+
+1. **Review and commit** the changes on `main`, then push: `git push origin main`.
+2. **Bump the version** so installed FocusFlow 0.2.0 apps see an update, for example
+   `npm version 0.3.0` (creates the commit and tag `v0.3.0`), then `git push origin main --tags`.
+3. **Let CI build the draft release** (section 4). Check the draft has the five files from section 5,
+   now named `Azm-…`. Edit the release title and notes; suggested notes:
+
+   > FocusFlow is now **Azm (عَزم)**: steady focus, meaningful progress. New name, new icon and a
+   > calmer look. Nothing else changes: your tasks, sessions, plans and settings carry over
+   > automatically, and the app keeps reading your existing data folder.
+
+4. **Test the upgrade before publishing** if you can: on Windows, install `FocusFlow-Setup-0.2.0.exe`,
+   add some data, then run `Azm-Setup-0.3.0.exe` and check the data is there, there is one Start
+   menu entry and one entry in *Installed apps*. This path has **not been tested**. On Fedora/Ubuntu,
+   `sudo dnf install ./Azm-0.3.0.x86_64.rpm` or `sudo apt install ./Azm-0.3.0_amd64.deb` over
+   FocusFlow 0.2.0 should upgrade the `focusflow` package in place.
+5. **Publish the release** (section 6). Installed 0.2.0 apps then show the update notice, and the
+   website's download buttons switch to the Azm files by themselves.
+6. **Redeploy the website**, because the site itself changed (name, colours, screenshots,
+   social image). Use the commands under *The live site* in section 8. The site keeps its current
+   address, `https://focusflow-lokman.netlify.app`; renaming it is optional and only done in Netlify
+   (Project configuration → Change project name). If you rename it, update the URL in this file,
+   README.md and the `VITE_SITE_URL` used for the build.
+7. **Optional:** rename the GitHub repository. GitHub redirects the old name, but installed apps
+   only accept update links from the repository in `package.json`, so if you rename it, update
+   `repository` in `package.json` and ship that in a release while the redirect still exists.
 
 ## Testing updates without publishing
 

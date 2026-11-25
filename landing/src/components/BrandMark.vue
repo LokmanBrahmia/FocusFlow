@@ -3,10 +3,16 @@ withDefaults(defineProps<{ size?: number }>(), { size: 24 })
 </script>
 
 <template>
-  <!-- The app's mark: a session ring three quarters through. -->
+  <!-- Azm's mark, same geometry as the app: one continuous stroke that echoes
+       the letter ع and ends in a dot, a path walked step by step. -->
   <svg :width="size" :height="size" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <circle cx="12" cy="12" r="9" stroke="var(--line)" stroke-width="2.5" />
-    <path d="M12 3a9 9 0 1 1-9 9" stroke="var(--iris)" stroke-width="2.5" stroke-linecap="round" />
-    <circle cx="12" cy="12" r="2.25" fill="var(--iris)" />
+    <path
+      d="M14.44 5.69A3.1 3.1 0 1 0 12 10.7A4.5 4.5 0 1 0 15.55 17.97"
+      stroke="var(--accent)"
+      stroke-width="2.2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <circle cx="17.33" cy="15.69" r="1.35" fill="var(--text)" />
   </svg>
 </template>

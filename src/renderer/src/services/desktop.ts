@@ -6,7 +6,7 @@ import type { DesktopAPI } from '../../../preload/api'
  */
 export function desktop(): DesktopAPI {
   if (!window.desktop) {
-    throw new Error('The desktop bridge is unavailable. Start FocusFlow through Electron.')
+    throw new Error('The desktop bridge is unavailable. Start Azm through Electron.')
   }
   return window.desktop
 }

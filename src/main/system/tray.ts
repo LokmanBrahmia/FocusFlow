@@ -28,7 +28,7 @@ export class AppTray {
     try {
       const icon = nativeImage.createFromPath(join(iconDir, 'tray.png'))
       this.tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon)
-      this.tray.setToolTip('FocusFlow')
+      this.tray.setToolTip('Azm')
       this.tray.on('click', this.actions.show)
       this.update(null)
     } catch (err) {
@@ -52,18 +52,18 @@ export class AppTray {
       : state.status === 'paused'
         ? `${SESSION_LABELS[state.sessionType]}, paused with ${formatClock(state.remainingMs)} left`
         : `${SESSION_LABELS[state.sessionType]}, ends at ${state.endsAt ? hhmm(state.endsAt) : ''}`
-    this.tray.setToolTip(`FocusFlow — ${status}`)
+    this.tray.setToolTip(`Azm — ${status}`)
     this.tray.setContextMenu(
       Menu.buildFromTemplate([
         { label: status, enabled: false },
         { type: 'separator' },
-        { label: 'Open FocusFlow', click: this.actions.show },
+        { label: 'Open Azm', click: this.actions.show },
         {
           label: state?.status === 'running' ? 'Pause timer' : state?.status === 'paused' ? 'Resume timer' : 'Start focus',
           click: this.actions.toggleTimer
         },
         { type: 'separator' },
-        { label: 'Quit FocusFlow', click: this.actions.quit }
+        { label: 'Quit Azm', click: this.actions.quit }
       ])
     )
   }

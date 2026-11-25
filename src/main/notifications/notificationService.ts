@@ -27,11 +27,11 @@ export class NotificationService {
     if (event.sessionType === 'focus') {
       if (!s.notifyFocusComplete) return null
       const next = s.autoStartBreaks ? 'Your break has started.' : 'Time for a break.'
-      return { title: 'Focus session complete', body: event.recovered ? 'It finished while FocusFlow was closed.' : next }
+      return { title: 'Focus session complete', body: event.recovered ? 'It finished while Azm was closed.' : next }
     }
     if (!s.notifyBreakComplete) return null
     const next = s.autoStartFocus ? 'Your next focus session has started.' : 'Ready for the next focus session?'
-    return { title: 'Break over', body: event.recovered ? 'It finished while FocusFlow was closed.' : next }
+    return { title: 'Break over', body: event.recovered ? 'It finished while Azm was closed.' : next }
   }
 
   private show(title: string, body: string): void {
