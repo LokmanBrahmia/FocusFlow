@@ -206,8 +206,31 @@ The site is hosted on **Netlify** (free plan), configured by `netlify.toml` at t
 - **Optional variables:** you can set `VITE_GITHUB_REPOSITORY` in Netlify, but it defaults to
   package.json. There are no secrets.
 
-To connect it once: Netlify → **Add new site → Import an existing project → GitHub →
-LokmanBrahmia/FocusFlow**. Netlify reads the settings above from `netlify.toml`.
+### The live site
+
+| | |
+| --- | --- |
+| URL | https://focusflow-lokman.netlify.app |
+| Netlify project | `focusflow-lokman` (team `brahmia16-lokman`), ID `7f73785f-1ea3-4520-9016-356714ca2420` |
+| Visitor access | Production public; deploy previews require a Netlify login (team default) |
+
+The site is **not linked to the GitHub repository yet**, so pushing to `main` does not redeploy
+it. That's fine for releases: the download buttons read GitHub Releases live, so a new release
+shows up without a redeploy. Redeploy only when the site itself changes:
+
+```bash
+cd landing
+VITE_SITE_URL=https://focusflow-lokman.netlify.app npm run build
+npx netlify-cli deploy --prod --dir dist --site 7f73785f-1ea3-4520-9016-356714ca2420
+```
+
+To deploy on every push instead: Netlify → `focusflow-lokman` → **Project configuration →
+Build & deploy → Link repository → GitHub → LokmanBrahmia/FocusFlow**. The settings come from
+`netlify.toml`.
+
+On the free plan Netlify injects an HTML comment and a `/.netlify/scripts/hud` script into the
+page. The site's CSP blocks that script's inline code, which shows as one console message. It is
+Netlify's toolbar, not FocusFlow code, and the page works normally.
 
 ### Alternative: Cloudflare Pages (free plan)
 

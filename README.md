@@ -5,8 +5,8 @@ Built with Electron, Vue 3, TypeScript, Tailwind CSS and SQLite. Everything is s
 The only network request is the update check against GitHub Releases, which can be turned off
 in Settings and sends no personal data.
 
-- **Downloads:** [GitHub Releases](https://github.com/LokmanBrahmia/FocusFlow/releases) and the
-  landing page.
+- **Website and downloads:** https://focusflow-lokman.netlify.app (served from
+  [GitHub Releases](https://github.com/LokmanBrahmia/FocusFlow/releases)).
 - **Releasing and deploying:** [DISTRIBUTION.md](DISTRIBUTION.md) has every step and command.
 - **Specifications:** [writing-block.md](writing-block.md) (app) and
   [writing-block 2.md](writing-block%202.md) (distribution).
