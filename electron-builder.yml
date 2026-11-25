@@ -1,0 +1,89 @@
+# FocusFlow packaging. Version comes from package.json; nothing here repeats it.
+# Targets: Fedora (RPM), Ubuntu/Debian (DEB), Windows (NSIS), all x64.
+# Build with the npm scripts (dist:linux, dist:win), which always pass
+# --publish never: releases are created by .github/workflows/release.yml.
+appId: com.focusflow.app
+productName: FocusFlow
+copyright: Copyright © FocusFlow contributors
+directories:
+  buildResources: build
+  output: release
+
+files:
+  - out/**/*
+  - package.json
+  - '!**/*.{ts,map}'
+  # better-sqlite3: ship only the runtime (lib/ + this platform's prebuilt
+  # binary). The SQLite sources, build scripts, any locally compiled build/
+  # folder and other platforms' binaries are left out.
+  - '!node_modules/better-sqlite3/{deps,src,build}/**'
+  - '!node_modules/better-sqlite3/{binding.gyp,README.md}'
+  - '!node_modules/better-sqlite3/prebuilds/!(${platform}-${arch}).node'
+
+extraResources:
+  - from: resources/icons
+    to: icons
+    filter:
+      - '*.png'
+
+# better-sqlite3 13 ships N-API prebuilds: one binary works in Node and in any
+# Electron version, so no ABI rebuild is needed (scripts/verify-native.mjs
+# checks this in CI). Native files cannot load from inside app.asar.
+asarUnpack:
+  - node_modules/better-sqlite3/**/*
+npmRebuild: false
+
+publish: null
+
+linux:
+  syncDesktopName: true
+  icon: build/icon.png
+  category: Office
+  synopsis: Pomodoro timer and study planner
+  description: Offline Pomodoro timer, task manager and study planner. Your data stays on your computer.
+  maintainer: FocusFlow maintainers
+  vendor: FocusFlow
+  executableName: focusflow
+  target:
+    - target: deb
+      arch: [x64]
+    - target: rpm
+      arch: [x64]
+  desktop:
+    entry:
+      StartupWMClass: FocusFlow
+      Keywords: pomodoro;timer;study;tasks;planner;focus;
+
+deb:
+  artifactName: ${productName}-${version}_amd64.${ext}
+
+rpm:
+  artifactName: ${productName}-${version}.x86_64.${ext}
+
+# Optional extra Linux format (npm run dist:appimage); not part of releases.
+appImage:
+  artifactName: ${productName}-${version}-x86_64.${ext}
+
+win:
+  icon: build/icon.png
+  target:
+    - target: nsis
+      arch: [x64]
+
+nsis:
+  artifactName: ${productName}-Setup-${version}.${ext}
+  oneClick: false
+  # Per-user install: no administrator rights needed, nothing written to Program Files.
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: FocusFlow
+  # Uninstalling keeps the user's data in %APPDATA%\FocusFlow.
+  deleteAppDataOnUninstall: false
+
+mac:
+  icon: build/icon.png
+  category: public.app-category.productivity
+  target:
+    - dmg

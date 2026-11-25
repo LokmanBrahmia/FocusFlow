@@ -1,0 +1,149 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/schibsted-grotesk';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * FocusFlow tokens.
+ * Dark is the default: a blue-leaning ink, not neutral black, so long
+ * evening sessions feel like a desk lamp rather than a terminal.
+ * Iris marks focus; tide is reserved for breaks so the two never blur.
+ */
+:root {
+  --bg: #f4f5f8;
+  --surface: #ffffff;
+  --surface-2: #eceff4;
+  --line: #dde1e8;
+  --text: #151821;
+  --muted: #5b6270;
+  --faint: #8a91a0;
+  --iris: #5a3fe0;
+  --iris-soft: #ece8ff;
+  --tide: #0b86b8;
+  --moss: #138a55;
+  --danger: #c4323f;
+  color-scheme: light;
+}
+
+:root.dark {
+  --bg: #0e1016;
+  --surface: #151922;
+  --surface-2: #1c212c;
+  --line: #262c39;
+  --text: #eceef3;
+  --muted: #9aa1af;
+  --faint: #687080;
+  --iris: #8f7bff;
+  --iris-soft: #221d3d;
+  --tide: #5cc8f0;
+  --moss: #3ecf8e;
+  --danger: #f0717a;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-iris: var(--iris);
+  --color-iris-soft: var(--iris-soft);
+  --color-tide: var(--tide);
+  --color-moss: var(--moss);
+  --color-danger: var(--danger);
+
+  --font-sans: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Fraunces Variable', ui-serif, Georgia, serif;
+
+  /* Modular scale, ratio 1.25 from a 14px desktop body size. */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.1rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.875rem;
+  --text-base--line-height: 1.4rem;
+  --text-lg: 1.09rem;
+  --text-lg--line-height: 1.6rem;
+  --text-xl: 1.37rem;
+  --text-xl--line-height: 1.85rem;
+  --text-2xl: 1.71rem;
+  --text-2xl--line-height: 2.1rem;
+  --text-3xl: 2.14rem;
+  --text-3xl--line-height: 2.5rem;
+  --text-4xl: 2.67rem;
+  --text-4xl--line-height: 3rem;
+}
+
+@layer base {
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'ss01';
+    user-select: none;
+  }
+
+  /* Text people may want to copy stays selectable. */
+  input,
+  textarea,
+  .selectable {
+    user-select: text;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--iris);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background: var(--iris-soft);
+  }
+
+  kbd {
+    font-family: var(--font-sans);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Page title: Fraunces at display optical size, softened. */
+.page-title {
+  font-family: var(--font-serif);
+  font-variation-settings:
+    'opsz' 72,
+    'SOFT' 60,
+    'WONK' 0;
+  font-weight: 420;
+  letter-spacing: -0.015em;
+}
+
+.route-enter-active {
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+.route-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
