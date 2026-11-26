@@ -13,29 +13,29 @@ const screens = [
     id: 'planner',
     label: 'Planner',
     src: planner,
-    caption: 'Plan study blocks for the day and see, next to them, the focus you actually recorded.',
-    alt: 'Day planner: a timeline with planned study blocks on the left, recorded focus sessions on the right, and the day’s tasks with progress bars.'
+    caption: 'Reserve study blocks on a timeline and see, beside them, the focus you actually recorded.',
+    alt: 'Day planner: a timeline with planned study blocks and recorded focus sessions side by side, with a summary of planned against focused time and the day’s tasks.'
   },
   {
     id: 'week',
     label: 'Week',
     src: week,
-    caption: 'Seven days side by side, with planned and focused time for each. Drag a task to another day to move it.',
-    alt: 'Week planner: seven columns with planned and focused time bars and the tasks planned for each day.'
+    caption: 'Unscheduled work above, seven days below. Each day shows its load against your daily goal; drag tasks onto the week to plan them.',
+    alt: 'Week planner: a tray of unscheduled tasks above seven day columns, each with a load bar against the daily goal and its planned tasks; today is highlighted.'
   },
   {
     id: 'tasks',
     label: 'Tasks',
     src: tasks,
-    caption: 'Tasks grouped by subject, with priorities, deadlines and focused time against your estimate.',
-    alt: 'Task list filtered by subject, showing priorities, deadlines and progress against estimates.'
+    caption: 'Tasks grouped by what needs attention first (overdue, today, this week), with priority, dates and progress in aligned columns.',
+    alt: 'Task list grouped by date into Overdue, Today and Next 7 days, with subject filters, an inline add field, and columns for priority, dates and progress.'
   },
   {
     id: 'stats',
     label: 'Statistics',
     src: stats,
-    caption: 'Focus time per day against your goal, completed Pomodoros, tasks and your study streak.',
-    alt: 'Statistics: focus time, Pomodoros, tasks completed and study streak, with a bar chart of focus time per day.'
+    caption: 'Headline figures, focus time per day against your goal, and the patterns behind it.',
+    alt: 'Statistics: a row of figures for focus time, Pomodoros, tasks completed, daily goal and study streak, above a bar chart of focus time per day with the goal line.'
   }
 ]
 

@@ -9,6 +9,10 @@ const faqs = [
     a: 'Azm (عَزم) is Arabic for resolve: the steady determination to keep going. The app used to be called FocusFlow; only the name and look changed, and your data carries over.'
   },
   {
+    q: 'Is Azm in Arabic or English?',
+    a: 'Both. Azm is designed Arabic first, with a full right-to-left layout, and English is available as a complete second language. Switch any time in Settings → Language; your data is not affected. Copies installed before version 0.4 stay in English until you switch.'
+  },
+  {
     q: 'Where is my data stored?',
     a: 'In one database file in your user folder: ~/.config/Azm/focusflow.sqlite on Linux, and %APPDATA%\\Azm\\focusflow.sqlite on Windows. If you used Azm when it was called FocusFlow, it keeps using your existing FocusFlow folder, so nothing is lost. Uninstalling the app does not delete it.'
   },

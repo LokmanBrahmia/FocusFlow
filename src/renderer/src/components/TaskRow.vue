@@ -12,7 +12,7 @@ import PrioritySignal from './PrioritySignal.vue'
 /**
  * One task as aligned columns, so a list can be scanned top to bottom:
  * completion · title and subject · priority · dates · progress · actions.
- * `compact` keeps title, progress and actions for narrow panels.
+ * `compact` (narrow side panels) keeps the title, with actions revealed on hover or focus.
  */
 const props = withDefaults(
   defineProps<{ task: Task; showSubject?: boolean; showPlanned?: boolean; compact?: boolean }>(),
@@ -35,7 +35,7 @@ const overdue = computed(() => !!props.task.deadline && !closed.value && isPast(
 <template>
   <li
     class="group relative grid items-center gap-x-4 rounded-xl px-3 py-2.5 transition-colors hover:bg-surface-2/60"
-    :class="compact ? 'grid-cols-[auto_1fr_auto]' : 'grid-cols-[1.25rem_minmax(0,1fr)_auto] @2xl:grid-cols-[1.25rem_minmax(0,1fr)_2rem_9rem_8.5rem_6.5rem]'"
+    :class="compact ? 'grid-cols-[1.25rem_minmax(0,1fr)]' : 'grid-cols-[1.25rem_minmax(0,1fr)_auto] @2xl:grid-cols-[1.25rem_minmax(0,1fr)_2rem_9rem_8.5rem_6.5rem]'"
   >
     <!-- Completion -->
     <button
@@ -93,7 +93,7 @@ const overdue = computed(() => !!props.task.deadline && !closed.value && isPast(
     </div>
 
     <!-- Progress against the estimate -->
-    <div class="text-sm text-muted tabular-nums" :class="compact ? 'max-sm:hidden' : '@max-2xl:hidden'">
+    <div v-if="!compact" class="text-sm text-muted tabular-nums @max-2xl:hidden">
       <template v-if="task.estimatedMinutes">
         <div class="track w-full min-w-16" aria-hidden="true">
           <span :class="(progress ?? 0) >= 1 && '!bg-moss'" :style="{ width: `${Math.min(1, progress ?? 0) * 100}%` }" />
@@ -107,8 +107,8 @@ const overdue = computed(() => !!props.task.deadline && !closed.value && isPast(
 
     <!-- Actions: visible on hover and keyboard focus -->
     <div
-      class="flex shrink-0 items-center justify-end gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 @max-2xl:opacity-100"
-      :class="compact && 'absolute end-2 top-1/2 -translate-y-1/2 rounded-lg bg-surface-2 shadow-sm @max-2xl:static @max-2xl:translate-y-0 @max-2xl:bg-transparent @max-2xl:shadow-none'"
+      class="flex shrink-0 items-center justify-end gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+      :class="compact ? 'absolute end-2 top-1/2 -translate-y-1/2 rounded-lg bg-surface-2 shadow-sm' : '@max-2xl:opacity-100'"
     >
       <button
         v-if="!closed"

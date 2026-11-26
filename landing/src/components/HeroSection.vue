@@ -53,7 +53,7 @@ const version = computed(() => (release.value.status === 'ready' ? release.value
           :src="focusShot"
           width="1600"
           height="1000"
-          alt="The Azm Focus screen: a large circular countdown at 23:58 for the task 'Derive backpropagation for a two-layer network', with Pause, Reset and Skip buttons."
+          alt="The Azm Focus screen: a large circular countdown at 24:59, the session cycle below it, and a dock linking the task 'Lab 4: subnetting' and its progress to the Pause, Reset and Skip buttons."
           class="block h-auto w-full"
           fetchpriority="high"
         />
