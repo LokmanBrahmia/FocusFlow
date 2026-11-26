@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { remainingMs as computeRemaining, type SessionType, type StartTimerInput, type TimerState } from '@shared/timer'
 import { desktop } from '@/services/desktop'
+import { translate } from '@shared/i18n'
+import { useSettingsStore } from './settings'
 
 /**
  * Mirror of the main-process timer. It never counts time itself: the
@@ -60,7 +62,7 @@ export const useTimerStore = defineStore('timer', () => {
       state.value = await action()
       tick()
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'The timer could not do that.'
+      error.value = err instanceof Error ? err.message : translate(useSettingsStore().settings.language, 'timer.error')
     }
   }
 

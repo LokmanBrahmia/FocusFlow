@@ -11,6 +11,7 @@ import {
   type TaskStatus,
   type UpdateTaskInput
 } from '@shared/tasks'
+import { tl } from '@shared/i18n'
 
 interface TaskRow {
   id: string
@@ -208,6 +209,6 @@ export class TaskRepository {
   private assertSubject(subjectId: string | null | undefined): void {
     if (!subjectId) return
     const row = this.db.prepare('SELECT 1 FROM subjects WHERE id = ?').get(subjectId)
-    if (!row) throw new InputError('That subject no longer exists.')
+    if (!row) throw new InputError(tl('err.subjectGone'))
   }
 }

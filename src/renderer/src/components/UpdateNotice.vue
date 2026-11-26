@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from '@/i18n'
 import { computed, ref } from 'vue'
 import { ArrowUpCircle, Copy, Download, ExternalLink, RotateCw } from '@lucide/vue'
 import { useUpdateStore } from '@/stores/updates'
@@ -13,6 +14,7 @@ import ConfirmDialog from './ConfirmDialog.vue'
 const store = useUpdateStore()
 const timer = useTimerStore()
 const toasts = useToastStore()
+const { t } = useI18n()
 
 const status = computed(() => store.state?.status)
 const mode = computed(() => store.state?.mode ?? 'manual')
@@ -30,9 +32,9 @@ function installNow(): void {
 async function copyCommand(cmd: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(cmd)
-    toasts.show('Command copied')
+    toasts.show(t('toast.commandCopied'))
   } catch {
-    toasts.show('Select the command and copy it manually.', 'error')
+    toasts.show(t('toast.copyManually'), 'error')
   }
 }
 </script>
@@ -46,19 +48,19 @@ async function copyCommand(cmd: string): Promise<void> {
   >
     <h2 id="update-title" class="flex items-center gap-2 font-medium">
       <ArrowUpCircle :size="16" :stroke-width="1.75" class="text-accent" aria-hidden="true" />
-      Azm {{ u.version }} is available
+      {{ t('update.available', { version: u.version }) }}
     </h2>
 
     <!-- Downloading (Windows) -->
     <template v-if="status.kind === 'downloading'">
-      <p class="mt-2 text-muted">Downloading… {{ status.percent }}%</p>
+      <p class="mt-2 text-muted">{{ t('update.downloading', { percent: status.percent }) }}</p>
       <div
         class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-line"
         role="progressbar"
         :aria-valuenow="status.percent"
         aria-valuemin="0"
         aria-valuemax="100"
-        aria-label="Update download"
+        :aria-label="t('update.downloadLabel')"
       >
         <div class="h-full rounded-full bg-accent transition-[width]" :style="{ width: `${status.percent}%` }" />
       </div>
@@ -67,11 +69,11 @@ async function copyCommand(cmd: string): Promise<void> {
     <!-- Downloaded (Windows): install only on request -->
     <template v-else-if="status.kind === 'downloaded'">
       <p class="mt-1.5 text-muted">
-        {{ status.installOnQuit ? 'It will install when you quit Azm.' : 'Ready to install. Your data is kept.' }}
+        {{ status.installOnQuit ? t('update.willInstallOnQuit') : t('update.ready') }}
       </p>
       <div class="mt-2.5 flex flex-col gap-1.5">
         <button type="button" class="btn-primary" :disabled="store.busy" @click="installNow">
-          <RotateCw :size="14" /> Install and restart
+          <RotateCw :size="14" /> {{ t('update.installRestart') }}
         </button>
         <button
           type="button"
@@ -79,7 +81,7 @@ async function copyCommand(cmd: string): Promise<void> {
           :disabled="store.busy"
           @click="store.installOnQuit(!status.installOnQuit)"
         >
-          {{ status.installOnQuit ? 'Don’t install on quit' : 'Install when I quit' }}
+          {{ status.installOnQuit ? t('update.dontInstallOnQuit') : t('update.installOnQuit') }}
         </button>
       </div>
     </template>
@@ -89,68 +91,68 @@ async function copyCommand(cmd: string): Promise<void> {
       <p class="mt-1.5 text-danger" role="alert">{{ status.message }}</p>
       <div class="mt-2.5 flex flex-wrap gap-1.5">
         <button v-if="mode === 'install'" type="button" class="btn-primary" :disabled="store.busy" @click="store.download()">
-          Try again
+          {{ t('common.tryAgain') }}
         </button>
         <button type="button" class="btn-quiet" @click="store.open(u.releaseUrl)">
-          Release page <ExternalLink :size="12" />
+          {{ t('update.releasePage') }} <ExternalLink :size="12" />
         </button>
       </div>
     </template>
 
     <!-- Available -->
     <template v-else-if="status.kind === 'available'">
-      <p class="mt-1.5 text-muted">You have {{ store.state?.currentVersion }}.</p>
+      <p class="mt-1.5 text-muted">{{ t('update.youHave', { version: store.state?.currentVersion ?? '' }) }}</p>
 
       <div v-if="mode === 'install'" class="mt-2.5 flex flex-col gap-1.5">
         <button type="button" class="btn-primary" :disabled="store.busy" @click="store.download()">
-          <Download :size="14" /> Download update
+          <Download :size="14" /> {{ t('update.download') }}
         </button>
       </div>
 
       <div v-else class="mt-2.5 flex flex-col gap-1.5">
         <button type="button" class="btn-primary" @click="store.open(u.assetUrl ?? u.releaseUrl)">
-          <Download :size="14" /> Download update
+          <Download :size="14" /> {{ t('update.download') }}
         </button>
         <button v-if="u.installCommand" type="button" class="btn-quiet" :aria-expanded="showSteps" @click="showSteps = !showSteps">
-          How to install
+          {{ t('update.howToInstall') }}
         </button>
         <div v-if="showSteps && u.installCommand" class="mt-1 text-xs text-muted">
-          <p>After the download finishes, run this in the folder you saved it to:</p>
+          <p>{{ t('update.runThis') }}</p>
           <div class="mt-1 flex items-center gap-1">
-            <code class="min-w-0 flex-1 overflow-x-auto rounded bg-bg px-1.5 py-1 whitespace-nowrap text-text">{{ u.installCommand }}</code>
-            <button type="button" aria-label="Copy command" class="grid size-6 shrink-0 place-items-center rounded text-muted hover:text-text" @click="copyCommand(u.installCommand)">
+            <code dir="ltr" class="min-w-0 flex-1 overflow-x-auto rounded bg-bg px-1.5 py-1 whitespace-nowrap text-text">{{ u.installCommand }}</code>
+            <button type="button" :aria-label="t('update.copy')" class="grid size-6 shrink-0 place-items-center rounded text-muted hover:text-text" @click="copyCommand(u.installCommand)">
               <Copy :size="13" />
             </button>
           </div>
-          <p class="mt-1">Your tasks and history are kept.</p>
+          <p class="mt-1">{{ t('update.kept') }}</p>
         </div>
       </div>
     </template>
 
     <div class="mt-2 flex items-center justify-between">
-      <button type="button" class="text-xs text-muted hover:text-text" @click="store.open(u.releaseUrl)">What’s new</button>
+      <button type="button" class="text-xs text-muted hover:text-text" @click="store.open(u.releaseUrl)">{{ t('update.whatsNew') }}</button>
       <button
         v-if="status.kind !== 'downloading'"
         type="button"
         class="text-xs text-muted hover:text-text"
         @click="store.later(u.version)"
       >
-        Later
+        {{ t('update.later') }}
       </button>
     </div>
   </section>
 
   <ConfirmDialog
     v-model:open="confirmOpen"
-    title="Restart during a focus session?"
-    message="Azm will close to install the update. Your session is saved and its timer keeps running, so it continues when Azm opens again."
-    confirm-label="Restart and install"
+    :title="t('update.restartTitle')"
+    :message="t('update.restartMessage')"
+    :confirm-label="t('update.restartConfirm')"
     @confirm="
       confirmOpen = false;
       store.install(true)
     "
   >
-    <p class="mt-3 text-sm text-muted">Or choose “Install when I quit” to update after you finish studying.</p>
+    <p class="mt-3 text-sm text-muted">{{ t('update.orOnQuit') }}</p>
   </ConfirmDialog>
 </template>
 
@@ -163,7 +165,7 @@ async function copyCommand(cmd: string): Promise<void> {
   gap: 0.375rem;
   border-radius: 0.5rem;
   background: var(--accent);
-  color: white;
+  color: var(--on-accent);
   font-weight: 500;
 }
 .btn-primary:hover:not(:disabled) {

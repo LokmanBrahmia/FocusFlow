@@ -219,8 +219,13 @@ src/
   `src/shared/brand.ts`, together with the English and Arabic taglines.
 - **Type:** IBM Plex Sans (variable) for everything Latin, including the light-weight timer
   digits, and IBM Plex Sans Arabic for Arabic text. Both are bundled for offline use. Arabic
-  runs are marked `lang="ar" dir="rtl"` and get a taller line height so diacritics are not
-  clipped; the rest of the interface stays left-to-right.
+  gets a taller line height so diacritics are not clipped, no letter-spacing (it breaks the
+  joins of cursive script), and a ~6% larger type scale.
+- **Structure:** every screen opens with the same header (context label, title, one line of
+  meaning, actions) and is built from a few shared parts: panels, segmented controls, chips,
+  thin progress tracks, aligned task rows and setting rows (`src/renderer/src/assets/main.css`
+  and `components/`). The sidebar groups navigation by intent (Today, Plan, Review) and keeps
+  the primary action, starting or controlling a focus session, at its foot.
 - **Colour:** deep charcoal dark theme (the default) and a neutral light theme. A muted mint
   (`--accent`) is the only brand colour and marks focus and primary actions; a muted blue
   (`--tide`) marks breaks. No gradients, glow or translucency. Subject colours come from a
@@ -240,9 +245,15 @@ All six phases of the specification are implemented.
   variables and the GitHub repository. Changing them would make the new version install beside
   the old one instead of upgrading it, or stop it from reading existing data and exports.
 
-- **Translations:** only English ships. The i18n layer (`src/renderer/src/i18n/`) and
-  right-to-left support are in place. Navigation and Settings use it; the other views still
-  have inline English strings to move into the catalogue before adding Arabic or French.
+- **Languages:** Arabic is the primary language and the default for new installs; English
+  is the complete secondary language (Settings → Language). Catalogues live in
+  `src/shared/i18n/` (`ar.ts`, `en.ts`) and are shared by the interface and the main process
+  (notifications, tray, file dialogs, update and import errors). A missing key is a type
+  error. Arabic uses CLDR plural rules (six forms), Western digits, and a full right-to-left
+  layout: the sidebar, panels, timelines and chart axes mirror; the timer, times, file paths
+  and shortcuts stay left-to-right. Installs that already had data before Arabic became the
+  default keep English (database migration 4) until the user switches. A few validation
+  messages for malformed requests that the interface cannot produce remain English.
 - **Platforms tested:** the DEB and RPM were installed and smoke-tested in clean Ubuntu 22.04
   and Fedora 41 containers. The Windows installer can only be built on Windows (or with Wine),
   so it has not been built or run yet; the CI workflow builds, installs and smoke-tests it.

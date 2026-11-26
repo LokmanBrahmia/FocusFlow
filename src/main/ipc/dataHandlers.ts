@@ -17,6 +17,7 @@ import {
   stageRestore
 } from '../data/dataService'
 import { handle } from './handlers'
+import { tl } from '@shared/i18n'
 
 interface DataDeps {
   db: DB
@@ -75,28 +76,28 @@ export function registerDataHandlers(deps: DataDeps): void {
   }
 
   handle(ctx, IPC.dataExport, async (): Promise<FileResult> => {
-    const path = await saveDialog('Export Azm data', `azm-export-${stamp()}.json`, 'json', 'Azm export')
+    const path = await saveDialog(tl('dialog.export'), `azm-export-${stamp()}.json`, 'json', tl('dialog.exportFilter'))
     if (!path) return { saved: false }
     writeFileSync(path, JSON.stringify(exportData(deps.db, deps.appVersion), null, 2), 'utf8')
     return { saved: true, path }
   })
 
   handle(ctx, IPC.dataBackup, async (): Promise<FileResult> => {
-    const path = await saveDialog('Back up Azm', `azm-backup-${stamp()}.sqlite`, 'sqlite', 'Azm backup')
+    const path = await saveDialog(tl('dialog.backup'), `azm-backup-${stamp()}.sqlite`, 'sqlite', tl('dialog.backupFilter'))
     if (!path) return { saved: false }
     await backupTo(deps.db, path)
     return { saved: true, path }
   })
 
   handle(ctx, IPC.dataPrepareImport, async (): Promise<ReplacePreview | null> => {
-    const path = await openDialog('Import Azm data', ['json'], 'Azm export')
+    const path = await openDialog(tl('dialog.import'), ['json'], tl('dialog.exportFilter'))
     if (!path) return null
-    if (statSync(path).size > MAX_IMPORT_BYTES) throw new InputError('This file is too large to be an Azm export.')
+    if (statSync(path).size > MAX_IMPORT_BYTES) throw new InputError(tl('err.tooLarge'))
     let parsed: unknown
     try {
       parsed = JSON.parse(readFileSync(path, 'utf8'))
     } catch {
-      throw new InputError('This file is not valid JSON.')
+      throw new InputError(tl('err.notJson'))
     }
     const { db, skippedSettings, exportedAt } = stageImport(parsed)
     const token = randomUUID()
@@ -114,7 +115,7 @@ export function registerDataHandlers(deps: DataDeps): void {
   })
 
   handle(ctx, IPC.dataPrepareRestore, async (): Promise<ReplacePreview | null> => {
-    const path = await openDialog('Restore an Azm backup', ['sqlite', 'db'], 'Azm backup')
+    const path = await openDialog(tl('dialog.restore'), ['sqlite', 'db'], tl('dialog.backupFilter'))
     if (!path) return null
     mkdirSync(backupsDir, { recursive: true })
     const workingCopy = join(backupsDir, `.restore-${randomUUID()}.sqlite`)
@@ -141,7 +142,7 @@ export function registerDataHandlers(deps: DataDeps): void {
 
   handle(ctx, IPC.dataConfirmReplace, async (token): Promise<ReplaceResult> => {
     const p = typeof token === 'string' ? pending.get(token) : undefined
-    if (!p) throw new InputError('This import has expired. Choose the file again.')
+    if (!p) throw new InputError(tl('err.expired'))
     try {
       // Never replace data without keeping a copy of what was there.
       mkdirSync(backupsDir, { recursive: true })

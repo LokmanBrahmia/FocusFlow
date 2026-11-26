@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from '@/i18n'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { X } from '@lucide/vue'
+
+const { t } = useI18n()
 
 /**
  * Modal built on the native <dialog>: focus is trapped and Escape closes it
@@ -42,7 +45,7 @@ function onBackdrop(e: MouseEvent): void {
       <h2 class="text-xl font-semibold">{{ title }}</h2>
       <button
         type="button"
-        aria-label="Close"
+        :aria-label="t('common.close')"
         class="grid size-8 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-text"
         @click="open = false"
       >

@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from '@/i18n'
 import AppDialog from './AppDialog.vue'
+
+const { t } = useI18n()
 
 const props = withDefaults(
   defineProps<{ title: string; message: string; confirmLabel: string; danger?: boolean }>(),
@@ -20,7 +23,7 @@ const open = defineModel<boolean>('open', { required: true })
         class="h-9 rounded-lg border border-line px-3.5 hover:bg-surface-2"
         @click="open = false"
       >
-        Cancel
+        {{ t('common.cancel') }}
       </button>
       <button
         type="button"

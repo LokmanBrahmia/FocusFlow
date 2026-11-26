@@ -5,6 +5,7 @@ import { getSchemaVersion, runMigrations, MIGRATIONS } from '../database/migrati
 import { EXPORT_FORMAT, EXPORT_VERSION, type DataCounts, type ExportFile, type Row } from '@shared/data'
 import { SETTING_VALIDATORS, isSettingKey } from '@shared/settings'
 import { InputError } from '@shared/tasks'
+import { tl } from '@shared/i18n'
 
 /**
  * Tables that hold user data, in insertion order (parents first). Deletion
@@ -64,17 +65,17 @@ export function exportData(db: DB, appVersion: string, now = new Date()): Export
  * database is not touched. Returns the staging database on success.
  */
 export function stageImport(raw: unknown): { db: DB; skippedSettings: number; exportedAt: string | null } {
-  if (typeof raw !== 'object' || raw === null) throw new InputError('This is not an Azm export file.')
+  if (typeof raw !== 'object' || raw === null) throw new InputError(tl('err.notExport'))
   const file = raw as Partial<ExportFile>
   if (file.format !== EXPORT_FORMAT || typeof file.data !== 'object' || file.data === null) {
-    throw new InputError('This is not an Azm export file.')
+    throw new InputError(tl('err.notExport'))
   }
   if (typeof file.version !== 'number' || file.version > EXPORT_VERSION) {
-    throw new InputError('This file was made by a newer version of Azm. Update the app to import it.')
+    throw new InputError(tl('err.newerExport'))
   }
   const latest = MIGRATIONS[MIGRATIONS.length - 1].version
   if (typeof file.schemaVersion === 'number' && file.schemaVersion > latest) {
-    throw new InputError('This file was made by a newer version of Azm. Update the app to import it.')
+    throw new InputError(tl('err.newerExport'))
   }
 
   const db = openDatabase(':memory:')
@@ -111,7 +112,7 @@ export function stageImport(raw: unknown): { db: DB; skippedSettings: number; ex
     load()
     // Foreign keys are checked per statement; this catches anything deferred.
     if ((db.pragma('foreign_key_check') as unknown[]).length > 0) {
-      throw new InputError('The file refers to tasks or subjects that are not in it.')
+      throw new InputError(tl('err.danglingRefs'))
     }
 
     let skipped = 0
@@ -150,12 +151,12 @@ export function stageRestore(source: string, workingCopy: string): DB {
     db = new Database(workingCopy, { fileMustExist: true })
     db.pragma('foreign_keys = ON')
     const ok = db.pragma('integrity_check', { simple: true })
-    if (ok !== 'ok') throw new InputError('This backup is damaged and cannot be restored.')
+    if (ok !== 'ok') throw new InputError(tl('err.damagedBackup'))
     const hasMigrations = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'schema_migrations'").get()
-    if (!hasMigrations) throw new InputError('This file is not an Azm backup.')
+    if (!hasMigrations) throw new InputError(tl('err.notBackup'))
     const latest = MIGRATIONS[MIGRATIONS.length - 1].version
     if (getSchemaVersion(db) > latest) {
-      throw new InputError('This backup was made by a newer version of Azm. Update the app to restore it.')
+      throw new InputError(tl('err.newerBackup'))
     }
     runMigrations(db)
     return db
@@ -163,7 +164,7 @@ export function stageRestore(source: string, workingCopy: string): DB {
     db?.close()
     rmSync(workingCopy, { force: true })
     if (err instanceof InputError) throw err
-    throw new InputError('This file is not an Azm backup.')
+    throw new InputError(tl('err.notBackup'))
   }
 }
 
@@ -185,7 +186,7 @@ export function replaceAll(live: DB, source: DB): DataCounts {
       }
     }
     if ((live.pragma('foreign_key_check') as unknown[]).length > 0) {
-      throw new InputError('The data could not be restored because it is inconsistent.')
+      throw new InputError(tl('err.inconsistent'))
     }
   })
   run()

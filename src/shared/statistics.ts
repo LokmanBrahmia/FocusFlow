@@ -1,4 +1,5 @@
 import { InputError, isDateString } from './tasks'
+import { tl } from './i18n'
 
 /** Inclusive range of local calendar dates. */
 export interface DateRange {
@@ -92,7 +93,7 @@ export function parseDateRange(raw: unknown): DateRange {
   if (!isDateString(from) || !isDateString(to)) throw new InputError('Choose valid dates.')
   if (from > to) throw new InputError('The start date must be on or before the end date.')
   const days = (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000 + 1
-  if (days > MAX_RANGE_DAYS) throw new InputError('Choose a range of ten years or less.')
+  if (days > MAX_RANGE_DAYS) throw new InputError(tl('err.rangeTooLong'))
   return { from, to }
 }
 

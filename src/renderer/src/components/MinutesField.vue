@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { useI18n } from '@/i18n'
 import { ref, watch } from 'vue'
+
+const { t } = useI18n()
 
 const props = withDefaults(
   defineProps<{ label: string; min: number; max: number; unit?: string }>(),
-  { unit: 'min' }
+  { unit: undefined }
 )
 const model = defineModel<number>({ required: true })
 
@@ -30,7 +33,7 @@ function commit(): void {
   <label class="flex flex-col gap-1.5">
     <span class="text-sm text-muted">{{ label }}</span>
     <span
-      class="flex h-9 items-center rounded-lg border bg-surface pr-3 focus-within:border-accent"
+      class="flex h-9 items-center rounded-lg border bg-bg pe-3 focus-within:border-accent"
       :class="invalid ? 'border-danger' : 'border-line'"
     >
       <input
@@ -44,8 +47,8 @@ function commit(): void {
         @blur="commit"
         @keydown.enter="commit"
       />
-      <span class="text-sm text-faint">{{ unit }}</span>
+      <span class="text-sm text-faint">{{ unit ?? t('unit.min') }}</span>
     </span>
-    <span v-if="invalid" class="text-xs text-danger">Enter a whole number from {{ min }} to {{ max }}.</span>
+    <span v-if="invalid" class="text-xs text-danger">{{ t('form.wholeNumber', { min, max }) }}</span>
   </label>
 </template>

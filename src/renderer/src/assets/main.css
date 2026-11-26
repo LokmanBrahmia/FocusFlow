@@ -1,7 +1,9 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/ibm-plex-sans';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-300.css';
 @import '@fontsource/ibm-plex-sans-arabic/arabic-400.css';
 @import '@fontsource/ibm-plex-sans-arabic/arabic-500.css';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-600.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -122,10 +124,26 @@
     font-family: var(--font-sans);
   }
 
-  /* Arabic runs (the name عَزم, taglines) get the Arabic face and room for diacritics. */
+  /*
+   * Arabic text gets room for diacritics. The font stack already falls back
+   * glyph by glyph to IBM Plex Sans Arabic, so digits and Latin names keep
+   * the Latin face in both languages and times read identically.
+   */
   :lang(ar) {
-    font-family: var(--font-arabic);
     line-height: 1.6;
+  }
+
+  /*
+   * Arabic as the interface language: Arabic glyphs read smaller than Latin
+   * at the same size, so the whole rem scale (type and spacing) grows ~6%.
+   */
+  html:lang(ar) {
+    font-size: 17px;
+  }
+
+  /* Tracking breaks the joins of cursive Arabic; timer digits keep theirs. */
+  :lang(ar) :not(.timer-digits, .timer-digits *) {
+    letter-spacing: 0 !important;
   }
 }
 
@@ -143,6 +161,196 @@
   font-family: var(--font-sans);
   font-weight: 330;
   letter-spacing: -0.022em;
+}
+:lang(ar) .page-title {
+  font-family: var(--font-arabic);
+  font-weight: 400;
+}
+
+/*
+ * Components of the Calm Systems kit. Layout lives in templates; these are
+ * the few recurring surfaces and controls, so every screen speaks one language.
+ */
+@layer components {
+  /* A framed region of a screen. */
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 1rem;
+  }
+
+  /* Small section label above a heading or a group of figures. */
+  .eyebrow {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    font-weight: 500;
+    color: var(--faint);
+  }
+  .eyebrow:lang(en) {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .btn {
+    display: inline-flex;
+    height: 2.25rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.625rem;
+    padding-inline: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      background-color 150ms,
+      filter 150ms,
+      color 150ms;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+  .btn-quiet {
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .btn-quiet:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+  .btn-ghost {
+    color: var(--muted);
+  }
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .btn-danger {
+    background: var(--danger);
+    color: #fff;
+  }
+  .btn-danger:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+
+  /* Square icon button. */
+  .icon-btn {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    border-radius: 0.625rem;
+    color: var(--muted);
+    transition:
+      background-color 150ms,
+      color 150ms;
+  }
+  .icon-btn:hover:not(:disabled) {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .icon-btn:disabled {
+    opacity: 0.4;
+  }
+
+  /* Text inputs and selects. */
+  .field {
+    height: 2.25rem;
+    width: 100%;
+    border-radius: 0.625rem;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    padding-inline: 0.75rem;
+    outline: none;
+    transition: border-color 150ms;
+  }
+  .field:focus {
+    border-color: var(--accent);
+  }
+  .field[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+
+  /* Segmented control: a group of mutually exclusive options. */
+  .seg {
+    display: inline-flex;
+    gap: 0.125rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    padding: 0.1875rem;
+  }
+  .seg > button {
+    display: inline-flex;
+    height: 1.875rem;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 0.5625rem;
+    padding-inline: 0.75rem;
+    color: var(--muted);
+    transition:
+      background-color 150ms,
+      color 150ms;
+  }
+  .seg > button:hover:not(:disabled) {
+    color: var(--text);
+  }
+  .seg > button[aria-checked='true'],
+  .seg > button[aria-pressed='true'] {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .seg > button:disabled {
+    opacity: 0.4;
+  }
+
+  /* Rounded filter chip. */
+  .chip {
+    display: inline-flex;
+    height: 1.875rem;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    padding-inline: 0.75rem;
+    color: var(--muted);
+    white-space: nowrap;
+    transition:
+      background-color 150ms,
+      color 150ms,
+      border-color 150ms;
+  }
+  .chip:hover {
+    color: var(--text);
+  }
+  .chip[aria-pressed='true'] {
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+    background: var(--accent-soft);
+    color: var(--text);
+  }
+
+  /* Thin progress track. */
+  .track {
+    position: relative;
+    height: 0.375rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--line) 70%, transparent);
+  }
+  .track > span {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    border-radius: 999px;
+    background: var(--accent);
+    transition: width 400ms ease;
+  }
 }
 
 .route-enter-active {

@@ -1,34 +1,85 @@
 import { computed, watchEffect } from 'vue'
-import type { LanguageCode } from '@shared/settings'
+import {
+  LANGS,
+  LANGUAGE_NAMES,
+  formatDuration,
+  formatDurationTick,
+  formatTime,
+  intlLocale,
+  isRtl,
+  translate,
+  type Lang,
+  type MessageKey,
+  type Params
+} from '@shared/i18n'
 import { useSettingsStore } from '@/stores/settings'
-import { en, type Messages } from './en'
+import { parseDay } from '@/utils/dates'
+import { differenceInCalendarDays } from 'date-fns'
 
-/**
- * Minimal i18n layer. Each language is a typed catalogue with the same keys
- * as English, so a missing translation is a type error. Adding Arabic or
- * French means: add ar.ts / fr.ts, register it here, widen LanguageCode and
- * the settings validator. `dir` is already applied, so Arabic gets RTL.
- *
- * Migrated so far: navigation and the Settings page. Other views still use
- * inline English and move over one at a time.
- */
-const catalogues: Record<LanguageCode, Messages> = { en }
-const RTL: ReadonlySet<string> = new Set(['ar'])
+export type { Lang, MessageKey }
+export const LANGUAGES = LANGS.map((code) => ({ code, name: LANGUAGE_NAMES[code] }))
 
-export const LANGUAGES: { code: LanguageCode; name: string }[] = [{ code: 'en', name: 'English' }]
+/** Last language used (read back by the settings store before settings load). */
+const CACHE_KEY = 'azm-language'
 
-type Params = Record<string, string | number>
-
-function interpolate(text: string, params?: Params): string {
-  return params ? text.replace(/\{(\w+)\}/g, (_, k: string) => String(params[k] ?? `{${k}}`)) : text
+const formatters = new Map<string, Intl.DateTimeFormat>()
+function dateFormat(lang: Lang, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+  const key = `${lang}|${JSON.stringify(options)}`
+  let f = formatters.get(key)
+  if (!f) formatters.set(key, (f = new Intl.DateTimeFormat(intlLocale(lang), options)))
+  return f
 }
+
+const toDate = (d: Date | string | number): Date => (typeof d === 'string' ? parseDay(d) : new Date(d))
+
+/** Formatting helpers bound to one language. Dates accept a Date, a timestamp or a YYYY-MM-DD day. */
+export function formattersFor(lang: Lang) {
+  const fmt = (options: Intl.DateTimeFormatOptions) => (d: Date | string | number) => dateFormat(lang, options).format(toDate(d))
+  const thisYear = new Date().getFullYear()
+  const dayMonth = fmt({ day: 'numeric', month: 'short' })
+  const dayMonthYear = fmt({ day: 'numeric', month: 'short', year: 'numeric' })
+  return {
+    /** "Thursday 26 November" / "الخميس، 26 نوفمبر" */
+    dayLong: fmt({ weekday: 'long', day: 'numeric', month: 'long' }),
+    /** "Thursday 26 November 2026" */
+    dayLongYear: fmt({ weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+    /** "26 Nov", with the year when it is not this year. */
+    dayMonth: (d: Date | string | number) => (toDate(d).getFullYear() === thisYear ? dayMonth(d) : dayMonthYear(d)),
+    dayMonthYear,
+    /** "26 November" */
+    dayMonthLong: fmt({ day: 'numeric', month: 'long' }),
+    /** "Thu" / "الخميس" */
+    weekdayShort: fmt({ weekday: 'short' }),
+    weekdayLong: fmt({ weekday: 'long' }),
+    /** "November 2026" */
+    monthYear: fmt({ month: 'long', year: 'numeric' }),
+    dayNumber: fmt({ day: 'numeric' }),
+    time: (d: Date | number) => formatTime(lang, d),
+    duration: (minutes: number) => formatDuration(lang, minutes),
+    durationTick: (minutes: number) => formatDurationTick(lang, minutes),
+    number: (n: number) => new Intl.NumberFormat(intlLocale(lang)).format(n),
+    percent: (fraction: number) =>
+      new Intl.NumberFormat(intlLocale(lang), { style: 'percent', maximumFractionDigits: 0 }).format(fraction),
+    /** "today" / "tomorrow" / "yesterday" / "26 Nov", for a YYYY-MM-DD day. */
+    relativeDay: (day: string) => {
+      const diff = differenceInCalendarDays(parseDay(day), new Date())
+      if (diff === 0) return translate(lang, 'date.today')
+      if (diff === 1) return translate(lang, 'date.tomorrow')
+      if (diff === -1) return translate(lang, 'date.yesterday')
+      return toDate(day).getFullYear() === thisYear ? dayMonth(day) : dayMonthYear(day)
+    }
+  }
+}
+
+export type Formatters = ReturnType<typeof formattersFor>
 
 export function useI18n() {
   const settings = useSettingsStore()
-  const lang = computed<LanguageCode>(() => settings.settings.language)
-  const messages = computed(() => catalogues[lang.value] ?? en)
-  const t = (key: keyof Messages, params?: Params): string => interpolate(messages.value[key] ?? en[key], params)
-  return { t, lang }
+  const lang = computed<Lang>(() => settings.settings.language)
+  const rtl = computed(() => isRtl(lang.value))
+  const f = computed(() => formattersFor(lang.value))
+  const t = (key: MessageKey, params?: Params): string => translate(lang.value, key, params)
+  return { t, lang, rtl, f }
 }
 
 /** Keeps <html lang> and dir in step with the language setting. */
@@ -37,6 +88,11 @@ export function useDocumentLanguage(): void {
   watchEffect(() => {
     const lang = settings.settings.language
     document.documentElement.lang = lang
-    document.documentElement.dir = RTL.has(lang) ? 'rtl' : 'ltr'
+    document.documentElement.dir = isRtl(lang) ? 'rtl' : 'ltr'
+    try {
+      localStorage.setItem(CACHE_KEY, lang)
+    } catch {
+      /* first paint simply uses the default */
+    }
   })
 }

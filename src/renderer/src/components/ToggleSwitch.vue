@@ -4,7 +4,7 @@ const model = defineModel<boolean>({ required: true })
 </script>
 
 <template>
-  <label class="flex items-start justify-between gap-6 py-1" :class="disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'">
+  <label class="flex items-start justify-between gap-6 py-3" :class="disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'">
     <span>
       <span class="block">{{ label }}</span>
       <span v-if="description" class="block text-sm text-muted">{{ description }}</span>
@@ -20,8 +20,8 @@ const model = defineModel<boolean>({ required: true })
       @click="model = !model"
     >
       <span
-        class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform"
-        :class="model && 'translate-x-4'"
+        class="absolute top-0.5 start-0.5 size-4 rounded-full bg-white shadow-sm transition-transform"
+        :class="model && 'translate-x-4 rtl:-translate-x-4'"
       />
     </button>
   </label>

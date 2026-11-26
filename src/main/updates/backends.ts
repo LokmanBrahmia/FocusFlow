@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { InvalidReleaseError, releaseToUpdate, type AvailableUpdate, type PackageFormat } from '@shared/updates'
 import type { UpdateBackend } from './updateService'
+import { tl } from '@shared/i18n'
 
 /**
  * How this copy of Azm was installed. electron-builder writes a
@@ -48,14 +49,14 @@ export class GitHubReleaseBackend implements UpdateBackend {
     })
     if (res.status === 404) return null // no stable release published yet
     if (res.status === 403 || res.status === 429) {
-      throw new InvalidReleaseError('GitHub is limiting requests right now. Try again in an hour.')
+      throw new InvalidReleaseError(tl('update.err.rateLimited'))
     }
     if (!res.ok) throw new InvalidReleaseError(`GitHub answered with status ${res.status}. Try again later.`)
     let body: unknown
     try {
       body = await res.json()
     } catch {
-      throw new InvalidReleaseError('The release information could not be read.')
+      throw new InvalidReleaseError(tl('update.err.unreadable'))
     }
     return releaseToUpdate(body, this.repository, this.currentVersion, this.format)
   }

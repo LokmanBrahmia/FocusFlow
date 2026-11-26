@@ -2,6 +2,7 @@ import { app } from 'electron'
 import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { tl } from '@shared/i18n'
 
 /**
  * Launch at login. macOS and Windows use Electron's login items. Linux has
@@ -21,7 +22,7 @@ function autostartDir(): string {
 }
 
 export function startupSupport(): StartupSupport {
-  if (!app.isPackaged) return { supported: false, reason: 'Available in the installed app.' }
+  if (!app.isPackaged) return { supported: false, reason: tl('settings.startupInstalledOnly') }
   return { supported: true }
 }
 

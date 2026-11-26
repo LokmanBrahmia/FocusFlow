@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { CreateSubjectInput, Subject, UpdateSubjectInput } from '@shared/tasks'
 import { desktop } from '@/services/desktop'
+import { translate } from '@shared/i18n'
+import { useSettingsStore } from './settings'
 
 export const useSubjectStore = defineStore('subjects', () => {
   const subjects = ref<Subject[]>([])
@@ -21,7 +23,7 @@ export const useSubjectStore = defineStore('subjects', () => {
       subjects.value = await desktop().subjects.getAll()
       error.value = null
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Subjects could not be loaded.'
+      error.value = err instanceof Error ? err.message : translate(useSettingsStore().settings.language, 'subject.loadError')
     } finally {
       loaded.value = true
     }

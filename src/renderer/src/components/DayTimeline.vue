@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { subjectColor } from '@/composables/useTheme'
 import { computed, onBeforeUnmount, ref } from 'vue'
-import { format } from 'date-fns'
 import { minutesOf, type DayPlan, type TimeBlock } from '@shared/planner'
-import { formatMinutes } from '@shared/tasks'
 import { useSubjectStore } from '@/stores/subjects'
 import { parseDay, todayISO } from '@/utils/dates'
+import { useI18n } from '@/i18n'
 
 /**
  * Two lanes on one clock: "Planned" holds study blocks (outlined), "Focused"
@@ -15,6 +14,7 @@ const props = defineProps<{ day: DayPlan }>()
 const emit = defineEmits<{ create: [start: string, end: string]; edit: [block: TimeBlock] }>()
 
 const subjects = useSubjectStore()
+const { t, f } = useI18n()
 const HOUR_PX = 52
 const pad = (n: number): string => String(n).padStart(2, '0')
 const hhmm = (min: number): string => `${pad(Math.floor(min / 60))}:${pad(min % 60)}`
@@ -66,10 +66,10 @@ function onLaneClick(e: MouseEvent): void {
     <div class="grid grid-cols-[3rem_1fr_1fr] gap-x-2 pb-2 text-sm text-muted">
       <span />
       <span class="flex items-center gap-2">
-        <span class="h-2.5 w-4 rounded-sm border border-dashed border-accent" aria-hidden="true" /> Planned
+        <span class="h-2.5 w-4 rounded-sm border border-dashed border-accent" aria-hidden="true" /> {{ t('plan.planned') }}
       </span>
       <span class="flex items-center gap-2">
-        <span class="h-2.5 w-4 rounded-sm bg-accent" aria-hidden="true" /> Focused
+        <span class="h-2.5 w-4 rounded-sm bg-accent" aria-hidden="true" /> {{ t('plan.focused') }}
       </span>
     </div>
 
@@ -79,7 +79,7 @@ function onLaneClick(e: MouseEvent): void {
         <div
           v-for="(h, i) in hours"
           :key="h"
-          class="absolute right-0 left-12 border-t border-line/70"
+          class="absolute start-12 end-0 border-t border-line/70"
           :style="{ top: `${i * HOUR_PX}px` }"
         />
       </div>
@@ -88,7 +88,7 @@ function onLaneClick(e: MouseEvent): void {
         <span
           v-for="(h, i) in hours"
           :key="h"
-          class="absolute right-1 -translate-y-1/2 text-xs text-faint tabular-nums"
+          class="absolute end-1 -translate-y-1/2 text-xs text-faint tabular-nums" dir="ltr"
           :style="{ top: `${i * HOUR_PX}px` }"
         >{{ pad(h) }}:00</span>
       </div>
@@ -97,14 +97,14 @@ function onLaneClick(e: MouseEvent): void {
       <div
         class="relative cursor-copy rounded-lg"
         role="group"
-        aria-label="Planned study blocks. Click an empty slot to add one."
+        :aria-label="t('plan.lanePlanned')"
         @click="onLaneClick"
       >
         <button
           v-for="b in day.blocks"
           :key="b.id"
           type="button"
-          class="absolute inset-x-0 overflow-hidden rounded-lg border border-dashed px-2.5 py-1 text-left text-sm transition-colors hover:bg-surface-2"
+          class="absolute inset-x-0 overflow-hidden rounded-lg border border-dashed px-2.5 py-1 text-start text-sm transition-colors hover:bg-surface-2"
           :style="{
             top: `${y(minutesOf(b.start))}px`,
             height: `${Math.max(22, y(minutesOf(b.end)) - y(minutesOf(b.start)) - 2)}px`,
@@ -114,32 +114,32 @@ function onLaneClick(e: MouseEvent): void {
           @click="emit('edit', b)"
         >
           <span class="block truncate font-medium">{{ b.taskTitle }}</span>
-          <span class="block text-xs text-muted tabular-nums">{{ b.start }}–{{ b.end }}</span>
+          <span class="block text-xs text-muted tabular-nums" dir="ltr">{{ b.start }}–{{ b.end }}</span>
         </button>
       </div>
 
       <!-- Actual lane -->
-      <div class="relative" role="list" aria-label="Recorded focus sessions">
+      <div class="relative" role="list" :aria-label="t('plan.laneFocused')">
         <div
           v-for="s in sessions"
           :key="s.id"
           role="listitem"
           class="absolute inset-x-0 overflow-hidden rounded-md bg-accent px-2.5 py-px text-sm text-on-accent"
           :style="{ top: `${y(s.start)}px`, height: `${Math.max(6, y(s.end) - y(s.start) - 2)}px` }"
-          :title="`${s.taskTitle ?? 'Focus'}: ${format(new Date(s.startedAt), 'HH:mm')}, ${formatMinutes(s.seconds / 60)}`"
+          :title="`${s.taskTitle ?? t('session.focus')}: ${f.time(new Date(s.startedAt))}, ${f.duration(s.seconds / 60)}`"
         >
-          <span v-if="y(s.end) - y(s.start) > 16" class="block truncate text-xs leading-4">{{ s.taskTitle ?? 'Focus session' }}</span>
-          <span v-if="y(s.end) - y(s.start) > 44" class="block text-xs text-on-accent/75">{{ formatMinutes(s.seconds / 60) }}</span>
+          <span v-if="y(s.end) - y(s.start) > 16" class="block truncate text-xs leading-4">{{ s.taskTitle ?? t('plan.focusSession') }}</span>
+          <span v-if="y(s.end) - y(s.start) > 44" class="block text-xs text-on-accent/75">{{ f.duration(s.seconds / 60) }}</span>
         </div>
       </div>
 
       <div
         v-if="nowY !== null && nowY >= 0 && nowY <= height"
-        class="pointer-events-none absolute right-0 left-12 flex items-center"
+        class="pointer-events-none absolute start-12 end-0 flex items-center"
         :style="{ top: `${nowY}px` }"
         aria-hidden="true"
       >
-        <span class="-ml-1 size-2 rounded-full bg-danger" />
+        <span class="-ms-1 size-2 rounded-full bg-danger" />
         <span class="h-px flex-1 bg-danger" />
       </div>
     </div>

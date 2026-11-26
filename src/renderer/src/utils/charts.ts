@@ -1,4 +1,5 @@
 import type { EChartsCoreOption } from 'echarts/core'
+import { formatDurationTick, isLang } from '@shared/i18n'
 
 export interface ChartTokens {
   text: string
@@ -9,6 +10,10 @@ export interface ChartTokens {
   tooltip: string
   accent: string
   font: string
+  /** Right-to-left: time runs from the right and the value axis sits on the right. */
+  rtl: boolean
+  /** Minute axis ticks in the interface language. */
+  minuteTick: (v: number) => string
 }
 
 /** Reads the live theme tokens so charts follow light/dark like the rest of the UI. */
@@ -23,7 +28,12 @@ export function readChartTokens(): ChartTokens {
     surface: v('--surface'),
     tooltip: v('--surface-2'),
     accent: v('--accent'),
-    font: "'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif"
+    font: "'IBM Plex Sans Variable', 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif",
+    rtl: document.documentElement.dir === 'rtl',
+    minuteTick: (m: number) => {
+      const lang = document.documentElement.lang
+      return formatDurationTick(isLang(lang) ? lang : 'en', m)
+    }
   }
 }
 
@@ -35,7 +45,7 @@ function tooltip(t: ChartTokens) {
     borderWidth: 1,
     padding: [8, 12],
     textStyle: { color: t.text, fontFamily: t.font, fontSize: 13 },
-    extraCssText: 'border-radius: 10px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);'
+    extraCssText: `border-radius: 10px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.25); direction: ${t.rtl ? 'rtl' : 'ltr'};`
   }
 }
 
@@ -83,13 +93,15 @@ export function barOption(t: ChartTokens, o: BarOptions): EChartsCoreOption {
       data: o.categories,
       axisLine: { lineStyle: { color: t.line } },
       axisTick: { show: false },
+      inverse: t.rtl,
       axisLabel: { color: t.faint, fontSize: 11, interval: o.labelInterval ?? 'auto', hideOverlap: true }
     },
     yAxis: {
       type: 'value',
+      position: t.rtl ? 'right' : 'left',
       splitNumber: 3,
       splitLine: { lineStyle: { color: t.line, opacity: 0.6 } },
-      axisLabel: { color: t.faint, fontSize: 11, formatter: o.minutes ? minuteTick : o.axisFormat },
+      axisLabel: { color: t.faint, fontSize: 11, formatter: o.minutes ? t.minuteTick : o.axisFormat },
       minInterval: 1,
       ...(o.minutes
         ? (() => {
@@ -112,7 +124,7 @@ export function barOption(t: ChartTokens, o: BarOptions): EChartsCoreOption {
               silent: true,
               symbol: 'none',
               lineStyle: { color: t.muted, type: 'dashed', width: 1 },
-              label: { formatter: o.reference.label, color: t.muted, position: 'insideEndTop', fontSize: 11 },
+              label: { formatter: o.reference.label, color: t.muted, position: t.rtl ? 'insideStartTop' : 'insideEndTop', fontSize: 11 },
               data: [{ yAxis: o.reference.value }]
             }
           : undefined
@@ -147,12 +159,14 @@ export function lineOption(t: ChartTokens, o: LineOptions): EChartsCoreOption {
       type: 'category',
       data: o.categories,
       boundaryGap: false,
+      inverse: t.rtl,
       axisLine: { lineStyle: { color: t.line } },
       axisTick: { show: false },
       axisLabel: { color: t.faint, fontSize: 11, hideOverlap: true }
     },
     yAxis: {
       type: 'value',
+      position: t.rtl ? 'right' : 'left',
       min: o.min,
       max: o.max,
       interval: 1,
@@ -184,9 +198,3 @@ export interface BarItem {
   color?: string
 }
 
-/** Compact minute ticks: 30m, 1 h, 1.5 h, 2 h. */
-export function minuteTick(v: number): string {
-  if (v < 60) return `${v}m`
-  const h = v / 60
-  return `${Number.isInteger(h) ? h : h.toFixed(1)} h`
-}

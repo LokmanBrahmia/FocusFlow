@@ -1,3 +1,4 @@
+import { tl } from './i18n'
 /**
  * Application updates.
  *
@@ -124,17 +125,17 @@ export function releaseToUpdate(
   currentVersion: string,
   format: PackageFormat
 ): AvailableUpdate | null {
-  if (typeof raw !== 'object' || raw === null) throw new InvalidReleaseError('The release information is not valid.')
+  if (typeof raw !== 'object' || raw === null) throw new InvalidReleaseError(tl('update.err.invalid'))
   const r = raw as Partial<GitHubRelease>
   if (typeof r.tag_name !== 'string' || typeof r.html_url !== 'string' || !Array.isArray(r.assets)) {
-    throw new InvalidReleaseError('The release information is incomplete.')
+    throw new InvalidReleaseError(tl('update.err.incomplete'))
   }
   if (r.draft || r.prerelease) return null
   const version = r.tag_name.replace(/^v/, '')
   if (!parseVersion(version)) throw new InvalidReleaseError(`The latest release has an invalid version (${r.tag_name}).`)
 
   const base = `https://github.com/${repository}/releases/`
-  if (!r.html_url.startsWith(base)) throw new InvalidReleaseError('The release page is not on Azm’s repository.')
+  if (!r.html_url.startsWith(base)) throw new InvalidReleaseError(tl('update.err.wrongRepo'))
   if (!isNewer(version, currentVersion)) return null
 
   const pattern = ASSET_PATTERNS[format]

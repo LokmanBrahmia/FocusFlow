@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
 import type { Component } from 'vue'
-import type { Messages } from '@/i18n/en'
+import type { MessageKey } from '@shared/i18n'
 import {
   CalendarRange,
   ChartColumn,
@@ -14,7 +14,7 @@ export interface NavItem {
   name: string
   path: string
   /** i18n key for the label. */
-  label: keyof Messages
+  label: MessageKey
   icon: Component
   /** Digit used with Ctrl/Cmd, when the spec assigns one. */
   shortcut?: string
@@ -34,43 +34,43 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'dashboard',
     component: () => import('@/views/DashboardView.vue'),
-    meta: { title: 'Today', subtitle: '' }
+    meta: { titleKey: 'nav.dashboard' }
   },
   {
     path: '/focus',
     name: 'focus',
     component: () => import('@/views/FocusView.vue'),
-    meta: { title: 'Focus', subtitle: 'One task, one timer, nothing else on screen.' }
+    meta: { titleKey: 'nav.focus' }
   },
   {
     path: '/tasks',
     name: 'tasks',
     component: () => import('@/views/TasksView.vue'),
-    meta: { title: 'Tasks', subtitle: 'Everything you need to study, grouped by subject.' }
+    meta: { titleKey: 'nav.tasks' }
   },
   {
     path: '/planner',
     name: 'planner',
     component: () => import('@/views/PlannerView.vue'),
-    meta: { title: 'Planner', subtitle: 'Plan the week, then compare it with what you actually did.' }
+    meta: { titleKey: 'nav.planner' }
   },
   {
     path: '/statistics',
     name: 'statistics',
     component: () => import('@/views/StatisticsView.vue'),
-    meta: { title: 'Statistics', subtitle: 'Where your study time really goes.' }
+    meta: { titleKey: 'nav.statistics' }
   },
   {
     path: '/settings',
     name: 'settings',
     component: () => import('@/views/SettingsView.vue'),
-    meta: { title: 'Settings', subtitle: 'Saved on this computer and kept between restarts.' }
+    meta: { titleKey: 'nav.settings' }
   },
   {
     path: '/mini',
     name: 'mini',
     component: () => import('@/views/MiniTimerView.vue'),
-    meta: { title: 'Timer', subtitle: '' }
+    meta: { titleKey: 'mini.title' }
   },
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]

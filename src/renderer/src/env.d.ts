@@ -7,9 +7,10 @@ declare module '*.vue' {
 }
 
 import 'vue-router'
+import type { MessageKey } from '@shared/i18n'
 declare module 'vue-router' {
   interface RouteMeta {
-    title: string
-    subtitle: string
+    /** Translation key for the window title. */
+    titleKey?: MessageKey
   }
 }

@@ -1,6 +1,7 @@
 import { Menu, Tray, nativeImage } from 'electron'
 import { join } from 'node:path'
-import { SESSION_LABELS, formatClock, type TimerState } from '@shared/timer'
+import { formatClock, type TimerState } from '@shared/timer'
+import { tl } from '@shared/i18n'
 
 const hhmm = (ms: number): string => {
   const d = new Date(ms)
@@ -28,7 +29,7 @@ export class AppTray {
     try {
       const icon = nativeImage.createFromPath(join(iconDir, 'tray.png'))
       this.tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon)
-      this.tray.setToolTip('Azm')
+      this.tray.setToolTip(tl('brand.name'))
       this.tray.on('click', this.actions.show)
       this.update(null)
     } catch (err) {
@@ -47,23 +48,24 @@ export class AppTray {
     const active = state && state.status !== 'idle'
     // The tray menu is rebuilt on timer changes, not every second, so it shows
     // the end time (still correct later) rather than a countdown.
+    const session = state ? tl(`session.${state.sessionType}`) : ''
     const status = !active
-      ? 'No session running'
+      ? tl('tray.idle')
       : state.status === 'paused'
-        ? `${SESSION_LABELS[state.sessionType]}, paused with ${formatClock(state.remainingMs)} left`
-        : `${SESSION_LABELS[state.sessionType]}, ends at ${state.endsAt ? hhmm(state.endsAt) : ''}`
-    this.tray.setToolTip(`Azm — ${status}`)
+        ? tl('tray.paused', { session, left: formatClock(state.remainingMs) })
+        : tl('tray.running', { session, time: state.endsAt ? hhmm(state.endsAt) : '' })
+    this.tray.setToolTip(`${tl('brand.name')} — ${status}`)
     this.tray.setContextMenu(
       Menu.buildFromTemplate([
         { label: status, enabled: false },
         { type: 'separator' },
-        { label: 'Open Azm', click: this.actions.show },
+        { label: tl('tray.open'), click: this.actions.show },
         {
-          label: state?.status === 'running' ? 'Pause timer' : state?.status === 'paused' ? 'Resume timer' : 'Start focus',
+          label: state?.status === 'running' ? tl('tray.pause') : state?.status === 'paused' ? tl('tray.resume') : tl('now.start'),
           click: this.actions.toggleTimer
         },
         { type: 'separator' },
-        { label: 'Quit Azm', click: this.actions.quit }
+        { label: tl('tray.quit'), click: this.actions.quit }
       ])
     )
   }

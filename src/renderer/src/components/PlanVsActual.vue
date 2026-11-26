@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { formatMinutes } from '@shared/tasks'
+import { useI18n } from '@/i18n'
 
 /**
  * Planned time as an outlined track, actual focus as a solid fill on top,
@@ -10,6 +10,7 @@ const props = withDefaults(
   defineProps<{ plannedMinutes: number; focusMinutes: number; scaleMinutes: number; stacked?: boolean }>(),
   { stacked: false }
 )
+const { t, f } = useI18n()
 
 const pct = (m: number): string => `${Math.min(100, (m / Math.max(1, props.scaleMinutes)) * 100)}%`
 const empty = computed(() => props.plannedMinutes === 0 && props.focusMinutes === 0)
@@ -21,25 +22,21 @@ const empty = computed(() => props.plannedMinutes === 0 && props.focusMinutes ==
       <div class="absolute inset-0 rounded-full bg-line/50" />
       <div
         v-if="plannedMinutes > 0"
-        class="absolute inset-y-0 left-0 rounded-full border border-dashed border-accent/70"
+        class="absolute inset-y-0 start-0 rounded-full border border-dashed border-accent/70"
         :style="{ width: pct(plannedMinutes) }"
       />
-      <div
-        v-if="focusMinutes > 0"
-        class="absolute inset-y-0 left-0 rounded-full bg-accent"
-        :style="{ width: pct(focusMinutes) }"
-      />
+      <div v-if="focusMinutes > 0" class="absolute inset-y-0 start-0 rounded-full bg-accent" :style="{ width: pct(focusMinutes) }" />
     </div>
     <dl class="mt-1.5 grid gap-x-2 text-xs" :class="stacked ? 'grid-cols-1' : 'grid-cols-2'">
       <template v-if="!empty">
-        <dt class="sr-only">Planned</dt>
-        <dd class="text-muted">{{ plannedMinutes ? formatMinutes(plannedMinutes) : 'Nothing' }} planned</dd>
-        <dt class="sr-only">Focused</dt>
-        <dd :class="[focusMinutes ? 'text-text' : 'text-faint', !stacked && 'text-right']">
-          {{ formatMinutes(focusMinutes) }} focused
+        <dt class="sr-only">{{ t('plan.planned') }}</dt>
+        <dd class="text-muted">{{ plannedMinutes ? t('plan.plannedAmount', { time: f.duration(plannedMinutes) }) : t('plan.nothingPlanned') }}</dd>
+        <dt class="sr-only">{{ t('plan.focused') }}</dt>
+        <dd :class="[focusMinutes ? 'text-text' : 'text-faint', !stacked && 'text-end']">
+          {{ t('plan.focusedAmount', { time: f.duration(focusMinutes) }) }}
         </dd>
       </template>
-      <dd v-else class="col-span-full text-faint">Nothing planned</dd>
+      <dd v-else class="col-span-full text-faint">{{ t('plan.nothingPlanned') }}</dd>
     </dl>
   </div>
 </template>

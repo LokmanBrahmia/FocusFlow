@@ -2,6 +2,7 @@ import type Database from 'better-sqlite3'
 import { migration001Initial } from './001_initial'
 import { migration002AppState } from './002_app_state'
 import { migration003SessionSubject } from './003_session_subject'
+import { migration004LanguageDefault } from './004_language_default'
 
 export interface Migration {
   version: number
@@ -10,7 +11,7 @@ export interface Migration {
 }
 
 /** Ordered list of every schema migration. Append only; never edit a shipped one. */
-export const MIGRATIONS: readonly Migration[] = [migration001Initial, migration002AppState, migration003SessionSubject]
+export const MIGRATIONS: readonly Migration[] = [migration001Initial, migration002AppState, migration003SessionSubject, migration004LanguageDefault]
 
 export class MigrationError extends Error {
   constructor(

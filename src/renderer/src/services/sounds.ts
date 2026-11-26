@@ -5,10 +5,11 @@
 
 import type { SoundName } from '@shared/settings'
 
-export const SOUND_OPTIONS: { value: SoundName; label: string }[] = [
-  { value: 'chime', label: 'Chime' },
-  { value: 'bell', label: 'Bell' },
-  { value: 'soft', label: 'Soft tone' }
+/** Labels are translation keys (sound.chime, sound.bell, sound.soft). */
+export const SOUND_OPTIONS: { value: SoundName; label: `sound.${SoundName}` }[] = [
+  { value: 'chime', label: 'sound.chime' },
+  { value: 'bell', label: 'sound.bell' },
+  { value: 'soft', label: 'sound.soft' }
 ]
 
 let ctx: AudioContext | null = null

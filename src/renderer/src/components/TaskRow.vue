@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import { subjectColor } from '@/composables/useTheme'
 import { computed } from 'vue'
-import { Check, Pencil, Play, Trash2 } from '@lucide/vue'
-import { PRIORITY_LABELS, formatMinutes, taskProgress, type Task } from '@shared/tasks'
+import { CalendarDays, Check, Flag, Pencil, Play, Trash2 } from '@lucide/vue'
+import { taskProgress, type Task } from '@shared/tasks'
 import { useSubjectStore } from '@/stores/subjects'
 import { useTaskActions } from '@/stores/taskActions'
-import { formatDay, isPast } from '@/utils/dates'
+import { isPast } from '@/utils/dates'
+import { useI18n } from '@/i18n'
+import PrioritySignal from './PrioritySignal.vue'
 
+/**
+ * One task as aligned columns, so a list can be scanned top to bottom:
+ * completion · title and subject · priority · dates · progress · actions.
+ * `compact` keeps title, progress and actions for narrow panels.
+ */
 const props = withDefaults(
   defineProps<{ task: Task; showSubject?: boolean; showPlanned?: boolean; compact?: boolean }>(),
   { showSubject: true, showPlanned: true, compact: false }
@@ -15,6 +22,7 @@ const emit = defineEmits<{ delete: [task: Task] }>()
 
 const subjects = useSubjectStore()
 const actions = useTaskActions()
+const { t, f } = useI18n()
 
 const subject = computed(() => (props.task.subjectId ? subjects.byId.get(props.task.subjectId) : undefined))
 const done = computed(() => props.task.status === 'completed')
@@ -25,14 +33,18 @@ const overdue = computed(() => !!props.task.deadline && !closed.value && isPast(
 </script>
 
 <template>
-  <li class="group relative flex items-start gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-surface-2/60">
+  <li
+    class="group relative grid items-center gap-x-4 rounded-xl px-3 py-2.5 transition-colors hover:bg-surface-2/60"
+    :class="compact ? 'grid-cols-[auto_1fr_auto]' : 'grid-cols-[1.25rem_minmax(0,1fr)_auto] @2xl:grid-cols-[1.25rem_minmax(0,1fr)_2rem_9rem_8.5rem_6.5rem]'"
+  >
+    <!-- Completion -->
     <button
       type="button"
       role="checkbox"
       :aria-checked="done"
-      :aria-label="done ? `Reopen ${task.title}` : `Complete ${task.title}`"
+      :aria-label="done ? t('task.reopen', { title: task.title }) : t('task.complete', { title: task.title })"
       :disabled="task.status === 'cancelled'"
-      class="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border transition-colors disabled:opacity-40"
+      class="grid size-5 shrink-0 place-items-center rounded-full border transition-colors disabled:opacity-40"
       :class="
         done
           ? 'border-moss bg-moss text-bg'
@@ -46,67 +58,82 @@ const overdue = computed(() => !!props.task.deadline && !closed.value && isPast(
       <span v-else-if="task.status === 'in_progress'" class="size-2 rounded-full bg-accent" />
     </button>
 
-    <div class="min-w-0 flex-1">
+    <!-- Title, subject, and on narrow screens the dates -->
+    <div class="min-w-0">
       <p class="truncate" :class="closed && 'text-muted line-through decoration-faint'">{{ task.title }}</p>
-      <p class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
-        <template v-if="!compact">
-          <span v-if="showSubject && subject" class="inline-flex items-center gap-1.5">
-            <span class="size-2 rounded-full" :style="{ background: subjectColor(subject.color) }" />
-            {{ subject.name }}
-          </span>
-          <span v-if="task.status === 'cancelled'">Cancelled</span>
-          <span
-            v-else-if="task.priority !== 'medium'"
-            :class="task.priority === 'high' ? 'text-text' : 'text-faint'"
-          >{{ PRIORITY_LABELS[task.priority] }} priority</span>
-          <span v-if="showPlanned && task.scheduledDate && !closed">Planned {{ formatDay(task.scheduledDate) }}</span>
-          <span v-if="task.deadline" :class="overdue && 'text-danger'">
-            {{ overdue ? 'Was due' : 'Due' }} {{ formatDay(task.deadline) }}
-          </span>
-        </template>
-        <span v-if="task.estimatedMinutes" class="inline-flex items-center gap-2">
-          <span class="relative h-1 w-14 overflow-hidden rounded-full bg-line" aria-hidden="true">
-            <span
-              class="absolute inset-y-0 left-0 rounded-full"
-              :class="(progress ?? 0) >= 1 ? 'bg-moss' : 'bg-accent'"
-              :style="{ width: `${Math.min(1, progress ?? 0) * 100}%` }"
-            />
-          </span>
-          <template v-if="focusedMinutes > 0">{{ formatMinutes(focusedMinutes) }} of {{ formatMinutes(task.estimatedMinutes) }}</template>
-          <template v-else>{{ formatMinutes(task.estimatedMinutes) }} estimated</template>
+      <p
+        v-if="(showSubject && subject) || task.status === 'cancelled' || task.status === 'in_progress'"
+        class="mt-0.5 flex flex-wrap items-center gap-x-3 text-sm text-muted"
+      >
+        <span v-if="showSubject && subject" class="inline-flex items-center gap-1.5">
+          <span class="size-2 rounded-full" :style="{ background: subjectColor(subject.color) }" aria-hidden="true" />
+          {{ subject.name }}
         </span>
-        <span v-else-if="focusedMinutes > 0">{{ formatMinutes(focusedMinutes) }} focused</span>
+        <span v-if="task.status === 'cancelled'">{{ t('status.cancelled') }}</span>
+        <span v-else-if="task.status === 'in_progress'" class="text-accent">{{ t('status.in_progress') }}</span>
+      </p>
+      <p v-if="!compact && (task.deadline || (showPlanned && task.scheduledDate))" class="mt-0.5 flex gap-3 text-sm text-muted @2xl:hidden">
+        <span v-if="task.deadline" :class="overdue && 'text-danger'">{{ t(overdue ? 'task.wasDue' : 'task.due', { day: f.relativeDay(task.deadline) }) }}</span>
       </p>
     </div>
 
+    <!-- Priority -->
+    <PrioritySignal v-if="!compact" :priority="task.priority" class="@max-2xl:hidden" />
+
+    <!-- Dates: planned day and deadline, each on its own line -->
+    <div v-if="!compact" class="flex flex-col gap-0.5 text-sm @max-2xl:hidden">
+      <span v-if="showPlanned && task.scheduledDate && !closed" class="inline-flex items-center gap-1.5 text-muted">
+        <CalendarDays :size="13" :stroke-width="1.75" class="shrink-0 text-faint" aria-hidden="true" />
+        <span class="sr-only">{{ t('task.plannedLabel') }}</span>{{ f.relativeDay(task.scheduledDate) }}
+      </span>
+      <span v-if="task.deadline" class="inline-flex items-center gap-1.5" :class="overdue ? 'text-danger' : 'text-muted'">
+        <Flag :size="13" :stroke-width="1.75" class="shrink-0" :class="!overdue && 'text-faint'" aria-hidden="true" />
+        {{ t(overdue ? 'task.wasDue' : 'task.due', { day: f.relativeDay(task.deadline) }) }}
+      </span>
+    </div>
+
+    <!-- Progress against the estimate -->
+    <div class="text-sm text-muted tabular-nums" :class="compact ? 'max-sm:hidden' : '@max-2xl:hidden'">
+      <template v-if="task.estimatedMinutes">
+        <div class="track w-full min-w-16" aria-hidden="true">
+          <span :class="(progress ?? 0) >= 1 && '!bg-moss'" :style="{ width: `${Math.min(1, progress ?? 0) * 100}%` }" />
+        </div>
+        <span class="mt-1 block text-xs">
+          {{ focusedMinutes > 0 ? t('task.ofEstimate', { done: f.duration(focusedMinutes), total: f.duration(task.estimatedMinutes) }) : t('task.estimated', { total: f.duration(task.estimatedMinutes) }) }}
+        </span>
+      </template>
+      <span v-else-if="focusedMinutes > 0" class="text-xs">{{ t('task.focused', { time: f.duration(focusedMinutes) }) }}</span>
+    </div>
+
+    <!-- Actions: visible on hover and keyboard focus -->
     <div
-      class="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
-      :class="compact && 'absolute top-2 right-2 rounded-lg bg-surface-2 shadow-sm'"
+      class="flex shrink-0 items-center justify-end gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 @max-2xl:opacity-100"
+      :class="compact && 'absolute end-2 top-1/2 -translate-y-1/2 rounded-lg bg-surface-2 shadow-sm @max-2xl:static @max-2xl:translate-y-0 @max-2xl:bg-transparent @max-2xl:shadow-none'"
     >
       <button
         v-if="!closed"
         type="button"
-        :aria-label="`Focus on ${task.title}`"
-        title="Focus on this task"
-        class="grid size-8 place-items-center rounded-lg text-accent hover:bg-accent-soft"
+        :aria-label="t('task.focusOn', { title: task.title })"
+        :title="t('task.focusOnShort')"
+        class="icon-btn size-8 text-accent hover:!bg-accent-soft"
         @click="actions.focusOn(task)"
       >
         <Play :size="15" :stroke-width="2" />
       </button>
       <button
         type="button"
-        :aria-label="`Edit ${task.title}`"
-        title="Edit"
-        class="grid size-8 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-text"
+        :aria-label="t('task.edit', { title: task.title })"
+        :title="t('common.edit')"
+        class="icon-btn size-8"
         @click="actions.openEdit(task)"
       >
         <Pencil :size="15" :stroke-width="1.75" />
       </button>
       <button
         type="button"
-        :aria-label="`Delete ${task.title}`"
-        title="Delete"
-        class="grid size-8 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-danger"
+        :aria-label="t('task.delete', { title: task.title })"
+        :title="t('common.delete')"
+        class="icon-btn size-8 hover:!text-danger"
         @click="emit('delete', task)"
       >
         <Trash2 :size="15" :stroke-width="1.75" />

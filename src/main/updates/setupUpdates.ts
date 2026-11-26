@@ -5,6 +5,7 @@ import { isTrustedReleaseUrl, parseVersion, type UpdateState } from '@shared/upd
 import { broadcast, handle, ValidationError } from '../ipc/handlers'
 import { createNsisBackend, detectPackageFormat, GitHubReleaseBackend } from './backends'
 import { UpdateScheduler, UpdateService, type UpdateBackend } from './updateService'
+import { tl } from '@shared/i18n'
 
 interface SetupDeps {
   isTrustedSender: (event: IpcMainInvokeEvent) => boolean
@@ -71,7 +72,7 @@ export async function setupUpdates(deps: SetupDeps): Promise<UpdateService> {
       typeof options === 'object' && options !== null && (options as Record<string, unknown>).acknowledgeActiveSession === true
     // Never cut a focus session short without the user's say-so.
     if (deps.timerActive() && !acknowledged) {
-      throw new ValidationError('A focus session is running. Confirm to restart now, or install when you quit Azm.')
+      throw new ValidationError(tl('update.err.sessionRunning'))
     }
     service.install()
   })
@@ -82,7 +83,7 @@ export async function setupUpdates(deps: SetupDeps): Promise<UpdateService> {
   handle(ctx, IPC.updatesOpenRelease, async (url) => {
     // Only this repository's release pages and files on github.com.
     if (typeof url !== 'string' || !UPDATE_REPOSITORY || !isTrustedReleaseUrl(url, UPDATE_REPOSITORY)) {
-      throw new ValidationError('That link is not an Azm release.')
+      throw new ValidationError(tl('update.err.notRelease'))
     }
     await shell.openExternal(url)
   })

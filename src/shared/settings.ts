@@ -5,8 +5,8 @@
  */
 
 export type ThemePreference = 'dark' | 'light' | 'system'
-/** Only English ships today; the i18n layer is ready for 'ar' and 'fr'. */
-export type LanguageCode = 'en'
+/** Arabic is the primary language (default for new installs); English is the secondary one. */
+export type LanguageCode = 'ar' | 'en'
 /** How the main window opens: last size and position, maximised, or the default 1280 × 800. */
 export type WindowBehavior = 'remember' | 'maximized' | 'default'
 
@@ -42,7 +42,7 @@ export type SettingKey = keyof AppSettings
 
 export const DEFAULT_SETTINGS: Readonly<AppSettings> = Object.freeze({
   theme: 'dark',
-  language: 'en',
+  language: 'ar',
   launchOnStartup: false,
   closeToTray: false,
   windowBehavior: 'remember',
@@ -81,7 +81,7 @@ export type SoundName = (typeof SOUND_NAMES)[number]
 
 export const SETTING_VALIDATORS: { [K in SettingKey]: (v: unknown) => v is AppSettings[K] } = {
   theme: oneOf('dark', 'light', 'system'),
-  language: oneOf('en'),
+  language: oneOf('ar', 'en'),
   launchOnStartup: isBool,
   closeToTray: isBool,
   windowBehavior: oneOf('remember', 'maximized', 'default'),

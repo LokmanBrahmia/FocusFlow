@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { useI18n } from '@/i18n'
 import { computed, reactive, ref, watch } from 'vue'
 import { blockMinutes, type TimeBlock, type TimeBlockInput } from '@shared/planner'
-import { formatMinutes } from '@shared/tasks'
 import { useTaskList } from '@/composables/useTaskList'
 import { useToastStore } from '@/stores/toasts'
 import { desktop } from '@/services/desktop'
 import AppDialog from './AppDialog.vue'
 import FormField from './FormField.vue'
+
+const { t, f } = useI18n()
 
 const open = defineModel<boolean>('open', { required: true })
 const props = defineProps<{ block: TimeBlock | null; defaults: Partial<TimeBlockInput> }>()
@@ -16,7 +18,7 @@ const { tasks } = useTaskList(() => ({ status: 'open', sort: 'priority', limit: 
 
 const form = reactive({ taskId: '', date: '', start: '', end: '' })
 const error = ref<string | null>(null)
-const inputClass = 'h-9 w-full rounded-lg border border-line bg-bg px-3 outline-none focus:border-accent'
+const inputClass = 'field'
 
 /** Open tasks, plus the block's own task if it has since been closed. */
 const options = computed(() => {
@@ -28,7 +30,7 @@ const options = computed(() => {
 })
 
 const length = computed(() =>
-  form.start && form.end && form.end > form.start ? formatMinutes(blockMinutes(form)) : null
+  form.start && form.end && form.end > form.start ? f.value.duration(blockMinutes(form)) : null
 )
 
 watch(open, (v) => {
@@ -44,21 +46,21 @@ watch(open, (v) => {
 async function save(): Promise<void> {
   error.value = null
   if (!form.taskId) {
-    error.value = 'Choose a task for this block.'
+    error.value = t('block.chooseTask')
     return
   }
   if (!form.start || !form.end || form.end <= form.start) {
-    error.value = 'The block must end after it starts.'
+    error.value = t('block.endAfterStart')
     return
   }
   try {
     const input = { ...form }
     if (props.block) await desktop().planner.updateBlock(props.block.id, input)
     else await desktop().planner.createBlock(input)
-    toasts.show(props.block ? 'Study block saved' : 'Study block added')
+    toasts.show(props.block ? t('toast.blockSaved') : t('toast.blockAdded'))
     open.value = false
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'The block could not be saved.'
+    error.value = err instanceof Error ? err.message : t('toast.blockSaveFailed')
   }
 }
 
@@ -66,33 +68,33 @@ async function remove(): Promise<void> {
   if (!props.block) return
   try {
     await desktop().planner.deleteBlock(props.block.id)
-    toasts.show('Study block removed')
+    toasts.show(t('toast.blockRemoved'))
     open.value = false
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'The block could not be removed.'
+    error.value = err instanceof Error ? err.message : t('toast.blockRemoveFailed')
   }
 }
 </script>
 
 <template>
-  <AppDialog v-model:open="open" :title="block ? 'Edit study block' : 'New study block'" width="28rem">
+  <AppDialog v-model:open="open" :title="block ? t('block.edit') : t('block.new')" width="28rem">
     <form class="flex flex-col gap-4" novalidate @submit.prevent="save">
-      <p class="text-sm text-muted">A block reserves time on your calendar. It does not start the timer.</p>
-      <FormField label="Task">
+      <p class="text-sm text-muted">{{ t('block.hint') }}</p>
+      <FormField :label="t('block.task')">
         <select v-model="form.taskId" autofocus :class="inputClass">
-          <option value="" disabled>Choose a task</option>
-          <option v-for="t in options" :key="t.id" :value="t.id">{{ t.title }}</option>
+          <option value="" disabled>{{ t('picker.choose') }}</option>
+          <option v-for="opt in options" :key="opt.id" :value="opt.id">{{ opt.title }}</option>
         </select>
       </FormField>
-      <FormField label="Date">
+      <FormField :label="t('block.date')">
         <input v-model="form.date" type="date" required :class="inputClass" />
       </FormField>
       <div class="grid grid-cols-2 gap-4">
-        <FormField label="From">
-          <input v-model="form.start" type="time" step="300" required :class="inputClass" />
+        <FormField :label="t('block.from')">
+          <input v-model="form.start" dir="ltr" type="time" step="300" required :class="inputClass" />
         </FormField>
-        <FormField label="To">
-          <input v-model="form.end" type="time" step="300" required :class="inputClass" />
+        <FormField :label="t('block.to')">
+          <input v-model="form.end" dir="ltr" type="time" step="300" required :class="inputClass" />
         </FormField>
       </div>
       <p v-if="length" class="-mt-1 text-sm text-muted">{{ length }}</p>
@@ -100,14 +102,14 @@ async function remove(): Promise<void> {
 
       <div class="flex items-center gap-2 pt-1">
         <button v-if="block" type="button" class="h-9 rounded-lg px-3 text-danger hover:bg-surface-2" @click="remove">
-          Remove block
+          {{ t('block.remove') }}
         </button>
         <span class="flex-1" />
         <button type="button" class="h-9 rounded-lg border border-line px-3.5 hover:bg-surface-2" @click="open = false">
-          Cancel
+          {{ t('common.cancel') }}
         </button>
         <button type="submit" class="h-9 rounded-lg bg-accent px-4 font-medium text-on-accent hover:brightness-110">
-          {{ block ? 'Save block' : 'Add block' }}
+          {{ block ? t('block.save') : t('block.add') }}
         </button>
       </div>
     </form>

@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from 'vue'
+import { useI18n } from '@/i18n'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { X } from '@lucide/vue'
 import { MAX_NOTE } from '@shared/statistics'
 import { desktop } from '@/services/desktop'
 import { useToastStore } from '@/stores/toasts'
+
+const { t } = useI18n()
 
 /**
  * Optional, non-modal check-in after a completed focus session. It never
@@ -16,7 +19,7 @@ const rating = ref<number | null>(null)
 const note = ref('')
 const saving = ref(false)
 
-const LABELS = ['Very distracted', 'Distracted', 'Okay', 'Focused', 'Deeply focused']
+const LABELS = computed(() => [t('rating.1'), t('rating.2'), t('rating.3'), t('rating.4'), t('rating.5')])
 
 const off = desktop().timer.onEvent((e) => {
   if (e.type !== 'session-finished' || e.sessionType !== 'focus' || e.outcome !== 'completed' || e.recovered) return
@@ -35,10 +38,10 @@ async function save(): Promise<void> {
   saving.value = true
   try {
     await desktop().sessions.rate(sessionId.value, rating.value, note.value || null)
-    toasts.show('Rating saved')
+    toasts.show(t('toast.ratingSaved'))
     dismiss()
   } catch (err) {
-    toasts.error(err, 'The rating could not be saved.')
+    toasts.error(err, t('toast.ratingFailed'))
   } finally {
     saving.value = false
   }
@@ -50,22 +53,22 @@ async function save(): Promise<void> {
     <section
       v-if="sessionId"
       aria-labelledby="rating-title"
-      class="fixed bottom-5 left-5 z-40 w-[22rem] rounded-2xl border border-line bg-surface p-4 shadow-2xl max-lg:left-20"
+      class="fixed start-5 bottom-5 z-40 w-[22rem] rounded-2xl border border-line bg-surface p-4 shadow-2xl max-lg:start-20 lg:start-[16.25rem]"
       @keydown.esc.stop="dismiss"
     >
       <div class="flex items-start justify-between gap-3">
-        <h2 id="rating-title" class="font-semibold">How focused were you during this session?</h2>
+        <h2 id="rating-title" class="font-semibold">{{ t('rating.question') }}</h2>
         <button
           type="button"
-          aria-label="Skip rating"
-          class="-mt-1 -mr-1 grid size-7 shrink-0 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-text"
+          :aria-label="t('rating.skipLabel')"
+          class="-mt-1 -me-1 grid size-7 shrink-0 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-text"
           @click="dismiss"
         >
           <X :size="15" />
         </button>
       </div>
 
-      <div role="radiogroup" aria-label="Focus rating" class="mt-3 grid grid-cols-5 gap-1.5">
+      <div role="radiogroup" :aria-label="t('rating.label')" class="mt-3 grid grid-cols-5 gap-1.5">
         <button
           v-for="n in 5"
           :key="n"
@@ -87,24 +90,24 @@ async function save(): Promise<void> {
 
       <template v-if="rating !== null">
         <label class="mt-3 block">
-          <span class="sr-only">Note (optional)</span>
+          <span class="sr-only">{{ t('rating.note') }}</span>
           <textarea
             v-model="note"
             rows="2"
             :maxlength="MAX_NOTE"
-            placeholder="Anything worth remembering? (optional)"
+            :placeholder="t('rating.notePlaceholder')"
             class="w-full resize-none rounded-lg border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-accent"
           />
         </label>
         <div class="mt-2 flex justify-end gap-2">
-          <button type="button" class="h-8 rounded-lg px-3 text-muted hover:bg-surface-2" @click="dismiss">Skip</button>
+          <button type="button" class="h-8 rounded-lg px-3 text-muted hover:bg-surface-2" @click="dismiss">{{ t('rating.skip') }}</button>
           <button
             type="button"
             :disabled="saving"
             class="h-8 rounded-lg bg-accent px-3 font-medium text-on-accent hover:brightness-110 disabled:opacity-50"
             @click="save"
           >
-            Save rating
+            {{ t('rating.save') }}
           </button>
         </div>
       </template>

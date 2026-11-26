@@ -14,6 +14,7 @@ import type { StatisticsRepository } from '../database/repositories/statisticsRe
 import type { FocusSessionRepository } from '../database/repositories/focusSessionRepository'
 import { TaskNotFoundError, type TimerService } from '../timer/timerService'
 import { UpdateActionError } from '../updates/updateService'
+import { tl } from '@shared/i18n'
 
 export class ValidationError extends Error {
   override name = 'ValidationError'
@@ -47,7 +48,7 @@ export function handle<T>(
 ): void {
   ipcMain.handle(channel, async (event, ...args): Promise<IpcResult<T>> => {
     if (!ctx.isTrustedSender(event)) {
-      return { ok: false, error: { code: 'INTERNAL', message: 'Request rejected.' } }
+      return { ok: false, error: { code: 'INTERNAL', message: tl('err.rejected') } }
     }
     try {
       return { ok: true, data: await fn(...args) }
@@ -63,8 +64,8 @@ export function handle<T>(
       return {
         ok: false,
         error: isDb
-          ? { code: 'DATABASE', message: 'The database could not complete that change.' }
-          : { code: 'INTERNAL', message: 'Something went wrong. Try again.' }
+          ? { code: 'DATABASE', message: tl('err.database') }
+          : { code: 'INTERNAL', message: tl('err.internal') }
       }
     }
   })

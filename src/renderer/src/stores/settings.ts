@@ -2,9 +2,20 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { DEFAULT_SETTINGS, type AppSettings, type SettingKey } from '@shared/settings'
 import { desktop } from '@/services/desktop'
+import { translate } from '@shared/i18n'
+
+/** Language used last time (written by useDocumentLanguage), so the first paint already has the right direction. */
+function cachedLanguage(): AppSettings['language'] | null {
+  try {
+    const v = localStorage.getItem('azm-language')
+    return v === 'ar' || v === 'en' ? v : null
+  } catch {
+    return null
+  }
+}
 
 export const useSettingsStore = defineStore('settings', () => {
-  const settings = ref<AppSettings>({ ...DEFAULT_SETTINGS })
+  const settings = ref<AppSettings>({ ...DEFAULT_SETTINGS, language: cachedLanguage() ?? DEFAULT_SETTINGS.language })
   const loaded = ref(false)
   const error = ref<string | null>(null)
   let unsubscribe: (() => void) | null = null
@@ -17,7 +28,7 @@ export const useSettingsStore = defineStore('settings', () => {
         settings.value = next
       })
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Settings could not be loaded.'
+      error.value = err instanceof Error ? err.message : translate(settings.value.language, 'app.settingsLoadError')
     } finally {
       loaded.value = true
     }

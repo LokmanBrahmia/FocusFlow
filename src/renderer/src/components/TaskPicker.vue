@@ -6,10 +6,12 @@ import type { Task } from '@shared/tasks'
 import { useTaskList } from '@/composables/useTaskList'
 import { useSubjectStore } from '@/stores/subjects'
 import { useTimerStore } from '@/stores/timer'
+import { useI18n } from '@/i18n'
 
 /** Lets the user link the current (or next) focus session to an open task. */
 const timer = useTimerStore()
 const subjects = useSubjectStore()
+const { t } = useI18n()
 
 const open = ref(false)
 const search = ref('')
@@ -68,49 +70,44 @@ onBeforeUnmount(() => window.removeEventListener('mousedown', onOutside))
       type="button"
       aria-haspopup="listbox"
       :aria-expanded="open"
-      class="inline-flex max-w-[40ch] items-center gap-1.5 rounded-lg px-2.5 py-1 text-lg transition-colors hover:bg-surface-2"
+      class="-ms-1.5 inline-flex max-w-full items-center gap-1.5 rounded-lg px-1.5 py-0.5 text-lg transition-colors hover:bg-surface-2"
       @click="open = !open"
     >
-      <span class="truncate" :class="!current && 'text-muted'">{{ current ?? 'Choose a task' }}</span>
+      <span class="truncate" :class="!current && 'text-muted'">{{ current ?? t('picker.choose') }}</span>
       <ChevronDown :size="16" class="shrink-0 text-faint" />
     </button>
 
     <div
       v-if="open"
-      class="absolute bottom-full left-1/2 z-20 mb-2 w-[22rem] -translate-x-1/2 overflow-hidden rounded-xl border border-line bg-surface text-left shadow-2xl"
+      class="absolute start-0 bottom-full z-20 mb-3 w-[24rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-line bg-surface text-start shadow-2xl"
       @keydown="onKey"
     >
       <label class="flex items-center gap-2 border-b border-line px-3">
         <Search :size="15" class="text-faint" />
-        <span class="sr-only">Search open tasks</span>
-        <input
-          ref="input"
-          v-model="search"
-          placeholder="Search open tasks"
-          class="h-10 flex-1 bg-transparent outline-none"
-        />
+        <span class="sr-only">{{ t('picker.search') }}</span>
+        <input ref="input" v-model="search" :placeholder="t('picker.search')" class="h-10 flex-1 bg-transparent outline-none" />
       </label>
-      <ul role="listbox" aria-label="Open tasks" class="max-h-72 overflow-y-auto p-1">
-        <li v-if="loading && tasks.length === 0" class="px-3 py-2 text-muted">Loading…</li>
+      <ul role="listbox" :aria-label="t('picker.list')" class="max-h-72 overflow-y-auto p-1">
+        <li v-if="loading && tasks.length === 0" class="px-3 py-2 text-muted">{{ t('common.loading') }}</li>
         <li v-else-if="tasks.length === 0" class="px-3 py-2 text-muted">
-          {{ search ? 'No open tasks match.' : 'No open tasks. Add one on the Tasks page.' }}
+          {{ search ? t('picker.noMatch') : t('picker.none') }}
         </li>
         <li
-          v-for="(t, i) in tasks"
-          :key="t.id"
+          v-for="(task, i) in tasks"
+          :key="task.id"
           role="option"
-          :aria-selected="timer.state?.taskId === t.id"
+          :aria-selected="timer.state?.taskId === task.id"
           class="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2"
           :class="i === active ? 'bg-surface-2' : ''"
           @mouseenter="active = i"
-          @click="choose(t)"
+          @click="choose(task)"
         >
           <span
             class="size-2 shrink-0 rounded-full"
-            :style="{ background: subjectColor(t.subjectId ? subjects.byId.get(t.subjectId)?.color : null, 'var(--line)') }"
+            :style="{ background: subjectColor(task.subjectId ? subjects.byId.get(task.subjectId)?.color : null, 'var(--line)') }"
           />
-          <span class="flex-1 truncate">{{ t.title }}</span>
-          <span v-if="t.priority === 'high'" class="text-xs text-muted">High</span>
+          <span class="flex-1 truncate">{{ task.title }}</span>
+          <span v-if="task.priority === 'high'" class="text-xs text-accent">{{ t('priority.highShort') }}</span>
         </li>
       </ul>
       <button
@@ -119,7 +116,7 @@ onBeforeUnmount(() => window.removeEventListener('mousedown', onOutside))
         class="flex w-full items-center gap-2 border-t border-line px-4 py-2.5 text-muted hover:bg-surface-2 hover:text-text"
         @click="choose(null)"
       >
-        <Unlink :size="14" /> Don't link a task
+        <Unlink :size="14" /> {{ t('picker.unlink') }}
       </button>
     </div>
   </div>

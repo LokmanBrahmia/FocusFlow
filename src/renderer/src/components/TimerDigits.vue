@@ -9,7 +9,7 @@ const glyphs = computed(() => formatClock(props.ms).split(''))
 </script>
 
 <template>
-  <span class="timer-digits" role="timer" :aria-label="formatClock(ms)">
+  <span class="timer-digits" dir="ltr" role="timer" :aria-label="formatClock(ms)">
     <span
       v-for="(g, i) in glyphs"
       :key="i"

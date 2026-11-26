@@ -1,6 +1,7 @@
 import { Notification } from 'electron'
 import type { AppSettings } from '@shared/settings'
 import type { TimerEvent } from '@shared/timer'
+import { formatDuration, tl } from '@shared/i18n'
 
 /**
  * Turns timer events into desktop notifications. Never throws: if the OS
@@ -21,17 +22,20 @@ export class NotificationService {
     const s = this.getSettings()
     if (event.type === 'daily-goal-reached') {
       if (!s.notifyDailyGoal) return null
-      return { title: 'Daily goal reached', body: `You have focused for ${event.goalMinutes} minutes today.` }
+      return {
+        title: tl('notify.goalTitle'),
+        body: tl('notify.goalBody', { time: formatDuration(s.language, event.goalMinutes) })
+      }
     }
     if (event.outcome !== 'completed') return null
     if (event.sessionType === 'focus') {
       if (!s.notifyFocusComplete) return null
-      const next = s.autoStartBreaks ? 'Your break has started.' : 'Time for a break.'
-      return { title: 'Focus session complete', body: event.recovered ? 'It finished while Azm was closed.' : next }
+      const next = s.autoStartBreaks ? tl('notify.breakStarted') : tl('notify.timeForBreak')
+      return { title: tl('notify.focusTitle'), body: event.recovered ? tl('notify.whileClosed') : next }
     }
     if (!s.notifyBreakComplete) return null
-    const next = s.autoStartFocus ? 'Your next focus session has started.' : 'Ready for the next focus session?'
-    return { title: 'Break over', body: event.recovered ? 'It finished while Azm was closed.' : next }
+    const next = s.autoStartFocus ? tl('notify.focusStarted') : tl('notify.readyForFocus')
+    return { title: tl('notify.breakTitle'), body: event.recovered ? tl('notify.whileClosed') : next }
   }
 
   private show(title: string, body: string): void {

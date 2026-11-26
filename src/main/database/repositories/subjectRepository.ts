@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import type { DB } from '../database'
 import { InputError, type CreateSubjectInput, type Subject, type UpdateSubjectInput } from '@shared/tasks'
+import { tl } from '@shared/i18n'
 
 interface SubjectRow {
   id: string
@@ -88,11 +89,11 @@ export class SubjectRepository {
    * a subject when it is null. Tasks and focus history are never deleted.
    */
   delete(id: string, reassignTo: string | null): void {
-    if (reassignTo === id) throw new InputError('Choose a different subject to move the tasks to.')
+    if (reassignTo === id) throw new InputError(tl('err.reassignSame'))
     const run = this.db.transaction(() => {
       if (!this.db.prepare('SELECT 1 FROM subjects WHERE id = ?').get(id)) throw new SubjectNotFound()
       if (reassignTo && !this.db.prepare('SELECT 1 FROM subjects WHERE id = ?').get(reassignTo)) {
-        throw new InputError('The subject to move tasks to no longer exists.')
+        throw new InputError(tl('err.reassignGone'))
       }
       this.db
         .prepare('UPDATE tasks SET subject_id = ?, updated_at = ? WHERE subject_id = ?')
@@ -106,6 +107,6 @@ export class SubjectRepository {
     const row = this.db
       .prepare('SELECT id FROM subjects WHERE name = ? COLLATE NOCASE AND id IS NOT ?')
       .get(name, exceptId ?? null)
-    if (row) throw new InputError(`A subject called "${name}" already exists.`)
+    if (row) throw new InputError(tl('err.subjectExists', { name }))
   }
 }

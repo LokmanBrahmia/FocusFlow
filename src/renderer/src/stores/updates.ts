@@ -3,12 +3,14 @@ import { computed, ref } from 'vue'
 import type { AvailableUpdate, UpdateState } from '@shared/updates'
 import { desktop } from '@/services/desktop'
 import { useToastStore } from './toasts'
+import { useI18n } from '@/i18n'
 
 /** Mirror of the main-process update state. All decisions happen in main. */
 export const useUpdateStore = defineStore('updates', () => {
   const state = ref<UpdateState | null>(null)
   const busy = ref(false)
   const toasts = useToastStore()
+  const { t: tr } = useI18n()
   let subscribed = false
 
   async function load(): Promise<void> {
@@ -57,12 +59,12 @@ export const useUpdateStore = defineStore('updates', () => {
     update,
     noticeVisible,
     load,
-    check: () => run(() => u().check(), 'The update check failed.'),
-    later: (version: string) => run(() => u().dismiss(version), 'Could not hide the notice.'),
-    download: () => run(() => u().download(), 'The update could not be downloaded.'),
+    check: () => run(() => u().check(), tr('update.err.check')),
+    later: (version: string) => run(() => u().dismiss(version), tr('update.err.hide')),
+    download: () => run(() => u().download(), tr('update.err.download')),
     install: (acknowledgeActiveSession = false) =>
-      run(() => u().install({ acknowledgeActiveSession }), 'The update could not be installed.'),
-    installOnQuit: (enabled: boolean) => run(() => u().setInstallOnQuit(enabled), 'That did not work.'),
-    open: (url: string) => run(() => u().openRelease(url), 'The release page could not be opened.')
+      run(() => u().install({ acknowledgeActiveSession }), tr('update.err.install')),
+    installOnQuit: (enabled: boolean) => run(() => u().setInstallOnQuit(enabled), tr('toast.genericError')),
+    open: (url: string) => run(() => u().openRelease(url), tr('update.err.open'))
   }
 })

@@ -2,10 +2,11 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { addDays, addWeeks, format, startOfWeek } from 'date-fns'
-import { ChevronLeft, ChevronRight, Clock, Plus } from '@lucide/vue'
+import { ChevronLeft, ChevronRight, Clock, Flag, Plus } from '@lucide/vue'
 import type { TimeBlock, TimeBlockInput } from '@shared/planner'
-import { formatMinutes } from '@shared/tasks'
+import { isDateString } from '@shared/tasks'
 import PageHeader from '@/components/PageHeader.vue'
+import AppPanel from '@/components/AppPanel.vue'
 import WeekPlanner from '@/components/WeekPlanner.vue'
 import DayTimeline from '@/components/DayTimeline.vue'
 import TimeBlockDialog from '@/components/TimeBlockDialog.vue'
@@ -15,57 +16,66 @@ import { usePlanRange } from '@/composables/usePlanRange'
 import { useTaskList } from '@/composables/useTaskList'
 import { useTaskActions } from '@/stores/taskActions'
 import { useSettingsStore } from '@/stores/settings'
-import { isDateString } from '@shared/tasks'
 import { parseDay, todayISO } from '@/utils/dates'
+import { useI18n } from '@/i18n'
 
 const route = useRoute()
 const router = useRouter()
 const actions = useTaskActions()
 const settings = useSettingsStore()
+const { t, f, rtl } = useI18n()
 
-// View and date live in the URL so "Open today's plan" can deep-link.
+// View and date live in the URL so other screens can deep-link to a day.
 const view = computed<'day' | 'week'>(() => (route.query.view === 'day' ? 'day' : 'week'))
 const date = computed(() => {
   const q = route.query.date
   return typeof q === 'string' && isDateString(q) ? q : todayISO()
 })
+const today = todayISO()
 const weekStart = computed(() => format(startOfWeek(parseDay(date.value), { weekStartsOn: 1 }), 'yyyy-MM-dd'))
+const weekEnd = computed(() => format(addDays(parseDay(weekStart.value), 6), 'yyyy-MM-dd'))
+const isThisWeek = computed(() => today >= weekStart.value && today <= weekEnd.value)
 
 const { days, loading, error } = usePlanRange(() =>
   view.value === 'week' ? { from: weekStart.value, days: 7 } : { from: date.value, days: 1 }
 )
 const day = computed(() => (view.value === 'day' ? days.value[0] : undefined))
 
-const title = computed(() => {
-  if (view.value === 'day') return format(parseDay(date.value), 'EEEE, d MMMM')
-  const start = parseDay(weekStart.value)
-  const end = addDays(start, 6)
-  return start.getMonth() === end.getMonth()
-    ? `${format(start, 'd')}–${format(end, 'd MMMM')}`
-    : `${format(start, 'd MMM')} – ${format(end, 'd MMM')}`
-})
-
+const goalMinutes = computed(() => settings.settings.dailyGoalMinutes)
 const weekTotals = computed(() => ({
   planned: days.value.reduce((s, d) => s + d.plannedMinutes, 0),
-  focused: Math.round(days.value.reduce((s, d) => s + d.focusSeconds, 0) / 60)
+  focused: Math.round(days.value.reduce((s, d) => s + d.focusSeconds, 0) / 60),
+  done: days.value.reduce((s, d) => s + d.completedCount, 0),
+  total: days.value.reduce((s, d) => s + d.totalCount, 0),
+  overloaded: days.value.filter((d) => d.plannedMinutes > goalMinutes.value * 1.25).length
 }))
 
+const eyebrow = computed(() =>
+  view.value === 'day'
+    ? date.value === today
+      ? t('date.todayTitle')
+      : f.value.weekdayLong(date.value)
+    : `${f.value.dayMonth(weekStart.value)} – ${f.value.dayMonth(weekEnd.value)}`
+)
+const title = computed(() => {
+  if (view.value === 'day') return f.value.dayMonthLong(date.value)
+  return isThisWeek.value ? t('plan.thisWeek') : t('plan.weekOf', { day: f.value.dayMonthLong(weekStart.value) })
+})
 const subtitle = computed(() => {
-  if (view.value === 'week') {
-    const { planned, focused } = weekTotals.value
-    return `${formatMinutes(planned)} planned, ${formatMinutes(focused)} focused this week.`
-  }
-  return 'Planned blocks on the left, the focus you actually recorded on the right.'
+  if (view.value === 'day') return t('plan.daySubtitle')
+  const w = weekTotals.value
+  return t('plan.weekSubtitle', { planned: f.value.duration(w.planned), focused: f.value.duration(w.focused), done: w.done, total: w.total })
 })
 
 function go(next: { view?: 'day' | 'week'; date?: string }): void {
   void router.replace({ query: { view: next.view ?? view.value, date: next.date ?? date.value } })
 }
-
 function step(dir: 1 | -1): void {
   const d = parseDay(date.value)
   go({ date: format(view.value === 'week' ? addWeeks(d, dir) : addDays(d, dir), 'yyyy-MM-dd') })
 }
+const Prev = computed(() => (rtl.value ? ChevronRight : ChevronLeft))
+const Next = computed(() => (rtl.value ? ChevronLeft : ChevronRight))
 
 // ── day view: blocks and planning ───────────────────────────────────────────
 const blockOpen = ref(false)
@@ -77,7 +87,6 @@ function newBlock(start = '09:00', end = '10:00'): void {
   blockDefaults.value = { date: date.value, start, end }
   blockOpen.value = true
 }
-
 function editBlock(b: TimeBlock): void {
   editingBlock.value = b
   blockOpen.value = true
@@ -85,128 +94,111 @@ function editBlock(b: TimeBlock): void {
 
 const { tasks: openTasks } = useTaskList(() => ({ status: 'open', sort: 'priority', limit: 500 }))
 const unplanned = computed(() => {
-  const planned = new Set(day.value?.tasks.map((t) => t.id))
-  return openTasks.value.filter((t) => !planned.has(t.id))
+  const planned = new Set(day.value?.tasks.map((x) => x.id))
+  return openTasks.value.filter((x) => !planned.has(x.id))
 })
 const planPick = ref('')
-
 async function planExisting(): Promise<void> {
   if (!planPick.value) return
-  await actions.update(planPick.value, { scheduledDate: date.value }, 'Task planned')
+  await actions.update(planPick.value, { scheduledDate: date.value }, t('toast.taskPlanned'))
   planPick.value = ''
 }
-
-const goalMinutes = computed(() => settings.settings.dailyGoalMinutes)
 </script>
 
 <template>
-  <div>
-    <PageHeader :title="title" :subtitle="subtitle">
+  <div class="flex flex-col gap-5">
+    <PageHeader :eyebrow="eyebrow" :title="title" :subtitle="subtitle">
       <template #actions>
-        <div role="radiogroup" aria-label="View" class="inline-flex rounded-xl border border-line bg-surface p-1">
+        <div role="radiogroup" :aria-label="t('plan.view')" class="seg">
           <button
             v-for="v in ['day', 'week'] as const"
             :key="v"
             type="button"
             role="radio"
             :aria-checked="view === v"
-            class="h-7 rounded-lg px-3 text-muted transition-colors hover:text-text"
-            :class="view === v && 'bg-surface-2 text-text'"
             @click="go({ view: v })"
           >
-            {{ v === 'day' ? 'Day' : 'Week' }}
+            {{ v === 'day' ? t('plan.day') : t('plan.week') }}
           </button>
         </div>
         <div class="flex items-center">
-          <button
-            type="button"
-            :aria-label="view === 'week' ? 'Previous week' : 'Previous day'"
-            class="grid size-9 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-text"
-            @click="step(-1)"
-          >
-            <ChevronLeft :size="18" />
+          <button type="button" class="icon-btn" :aria-label="view === 'week' ? t('plan.prevWeek') : t('plan.prevDay')" @click="step(-1)">
+            <component :is="Prev" :size="18" />
           </button>
-          <button type="button" class="h-9 rounded-lg px-3 hover:bg-surface-2" @click="go({ date: todayISO() })">Today</button>
-          <button
-            type="button"
-            :aria-label="view === 'week' ? 'Next week' : 'Next day'"
-            class="grid size-9 place-items-center rounded-lg text-muted hover:bg-surface-2 hover:text-text"
-            @click="step(1)"
-          >
-            <ChevronRight :size="18" />
+          <button type="button" class="btn btn-ghost px-3" @click="go({ date: today })">{{ t('date.todayTitle') }}</button>
+          <button type="button" class="icon-btn" :aria-label="view === 'week' ? t('plan.nextWeek') : t('plan.nextDay')" @click="step(1)">
+            <component :is="Next" :size="18" />
           </button>
         </div>
       </template>
     </PageHeader>
 
     <p v-if="error" role="alert" class="text-danger">{{ error }}</p>
-    <p v-else-if="loading && days.length === 0" class="text-muted">Loading the plan…</p>
+    <p v-else-if="loading && days.length === 0" class="text-muted">{{ t('common.loading') }}</p>
 
     <template v-else-if="view === 'week'">
+      <p v-if="weekTotals.overloaded" class="-mt-2 flex items-center gap-2 text-sm text-danger">
+        <span class="size-1.5 rounded-full bg-danger" aria-hidden="true" />
+        {{ t('plan.overloaded', { count: weekTotals.overloaded, goal: f.duration(goalMinutes) }) }}
+      </p>
       <WeekPlanner :days="days" @open-day="(d) => go({ view: 'day', date: d })" />
-      <p class="mt-3 text-sm text-faint">Drag a task to another day to reschedule it. Planned time is study blocks plus estimates of tasks without a block.</p>
+      <p class="text-sm text-faint">{{ t('plan.weekHint') }}</p>
     </template>
 
-    <div v-else-if="day" class="grid gap-10 lg:grid-cols-[1fr_18rem]">
-      <DayTimeline :day="day" @create="newBlock" @edit="editBlock" />
+    <div v-else-if="day" class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <section class="panel p-5" :aria-label="t('plan.timeline')">
+        <DayTimeline :day="day" @create="newBlock" @edit="editBlock" />
+      </section>
 
-      <aside class="flex flex-col gap-8">
-        <section aria-labelledby="day-summary">
-          <h2 id="day-summary" class="sr-only">Summary</h2>
+      <aside class="flex flex-col gap-5">
+        <AppPanel :title="t('plan.summary')">
           <PlanVsActual
             :planned-minutes="day.plannedMinutes"
             :focus-minutes="Math.round(day.focusSeconds / 60)"
             :scale-minutes="Math.max(day.plannedMinutes, goalMinutes, day.focusSeconds / 60)"
           />
           <p class="mt-3 text-sm text-muted">
-            Daily goal {{ formatMinutes(goalMinutes) }}.
-            <template v-if="day.focusSeconds / 60 >= goalMinutes">Reached.</template>
-            <template v-else>{{ formatMinutes(goalMinutes - Math.floor(day.focusSeconds / 60)) }} to go.</template>
+            {{ t('plan.goalLine', { goal: f.duration(goalMinutes) }) }}
+            {{ day.focusSeconds / 60 >= goalMinutes ? t('plan.goalReached') : t('plan.goalToGo', { time: f.duration(goalMinutes - Math.floor(day.focusSeconds / 60)) }) }}
           </p>
-          <button
-            type="button"
-            class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-line px-3 hover:bg-surface-2"
-            @click="newBlock()"
-          >
-            <Clock :size="15" :stroke-width="1.75" /> Add study block
+          <button type="button" class="btn btn-quiet mt-4 w-full" @click="newBlock()">
+            <Clock :size="15" :stroke-width="1.75" /> {{ t('plan.addBlock') }}
           </button>
-        </section>
+        </AppPanel>
 
-        <section aria-labelledby="day-tasks">
-          <div class="flex items-baseline justify-between">
-            <h2 id="day-tasks" class="font-semibold">Planned tasks</h2>
-            <span v-if="day.totalCount" class="text-sm text-muted">{{ day.completedCount }} of {{ day.totalCount }} done</span>
+        <AppPanel
+          :title="t('plan.tasksForDay')"
+          :meta="day.totalCount ? t('common.doneOf', { done: day.completedCount, total: day.totalCount }) : undefined"
+          flush
+        >
+          <div class="px-2">
+            <TaskList v-if="day.tasks.length" :tasks="day.tasks" :show-planned="false" compact />
+            <p v-else class="px-3 pb-2 text-sm text-muted">{{ t('plan.noTasksDay') }}</p>
           </div>
-          <TaskList v-if="day.tasks.length" :tasks="day.tasks" :show-planned="false" compact class="mt-1" />
-          <p v-else class="mt-2 text-sm text-muted">No tasks planned for this day yet.</p>
-
-          <div class="mt-3 flex flex-col gap-2">
+          <div class="flex flex-col gap-2 px-5 pt-2 pb-5">
             <select
               v-if="unplanned.length"
               v-model="planPick"
-              aria-label="Plan an existing task for this day"
-              class="h-9 rounded-lg border border-line bg-surface px-2.5 text-muted outline-none focus:border-accent"
+              :aria-label="t('plan.planExisting')"
+              class="field text-muted"
               @change="planExisting"
             >
-              <option value="">Plan an existing task…</option>
-              <option v-for="t in unplanned" :key="t.id" :value="t.id">{{ t.title }}</option>
+              <option value="">{{ t('plan.planExisting') }}</option>
+              <option v-for="x in unplanned" :key="x.id" :value="x.id">{{ x.title }}</option>
             </select>
-            <button
-              type="button"
-              class="inline-flex h-9 items-center gap-2 rounded-lg px-2 text-muted hover:bg-surface-2 hover:text-text"
-              @click="actions.openCreate({ scheduledDate: date })"
-            >
-              <Plus :size="16" /> New task for this day
+            <button type="button" class="btn btn-ghost justify-start px-2" @click="actions.openCreate({ scheduledDate: date })">
+              <Plus :size="16" /> {{ t('plan.newTaskDay') }}
             </button>
           </div>
-        </section>
+        </AppPanel>
 
-        <section v-if="day.deadlines.length" aria-labelledby="day-due">
-          <h2 id="day-due" class="font-semibold">Due this day</h2>
-          <ul class="mt-2 flex flex-col gap-1.5 text-sm">
-            <li v-for="t in day.deadlines" :key="t.id" class="text-danger">{{ t.title }}</li>
+        <AppPanel v-if="day.deadlines.length" :title="t('plan.dueDay')">
+          <ul class="flex flex-col gap-1.5 text-sm">
+            <li v-for="x in day.deadlines" :key="x.id" class="flex items-start gap-2 text-danger">
+              <Flag :size="13" class="mt-1 shrink-0" aria-hidden="true" /> {{ x.title }}
+            </li>
           </ul>
-        </section>
+        </AppPanel>
       </aside>
     </div>
 

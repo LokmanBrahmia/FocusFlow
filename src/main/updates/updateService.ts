@@ -6,6 +6,7 @@ import {
   type UpdateState,
   type UpdateStatus
 } from '@shared/updates'
+import { tl } from '@shared/i18n'
 
 export interface DownloadProgress {
   percent: number
@@ -49,20 +50,20 @@ export function describeError(err: unknown, during: 'check' | 'download' | 'inst
   const text = err instanceof Error ? `${(err as NodeJS.ErrnoException).code ?? ''} ${err.message}` : String(err)
   if (NETWORK_CODES.test(text)) {
     return during === 'download'
-      ? 'The download was interrupted. Check your internet connection and try again.'
-      : 'Couldn’t reach GitHub. Check your internet connection and try again.'
+      ? tl('update.err.interrupted')
+      : tl('update.err.offline')
   }
   if (/sha512 checksum mismatch|checksum/i.test(text)) {
-    return 'The downloaded update did not match its checksum and was discarded. Try again.'
+    return tl('update.err.checksum')
   }
   if (/HttpError: 404|status code 404|\b404\b/.test(text)) {
-    return 'The update files could not be found on the release.'
+    return tl('update.err.notFound')
   }
   return during === 'check'
-    ? 'The update check failed. Try again later.'
+    ? tl('update.err.checkLater')
     : during === 'download'
-      ? 'The update could not be downloaded. Try again.'
-      : 'The update could not be installed. Try again, or download it from the release page.'
+      ? tl('update.err.downloadAgain')
+      : tl('update.err.installAgain')
 }
 
 /**
@@ -139,9 +140,9 @@ export class UpdateService {
     const s = this.status
     const update = s.kind === 'available' ? s.update : s.kind === 'error' && s.during === 'download' ? s.update : null
     if (!backend?.download || backend.mode !== 'install') {
-      throw new UpdateActionError('This version of Azm is updated by installing the new package from the release page.')
+      throw new UpdateActionError(tl('update.err.manualOnly'))
     }
-    if (!update) throw new UpdateActionError('There is no update to download.')
+    if (!update) throw new UpdateActionError(tl('update.err.nothing'))
 
     this.set({ kind: 'downloading', update, percent: 0, transferred: 0, total: 0 })
     try {
@@ -167,7 +168,7 @@ export class UpdateService {
   install(): void {
     const backend = this.deps.backend
     if (this.status.kind !== 'downloaded' || !backend?.install) {
-      throw new UpdateActionError('The update has not been downloaded yet.')
+      throw new UpdateActionError(tl('update.err.notDownloaded'))
     }
     const update = this.status.update
     try {
@@ -181,7 +182,7 @@ export class UpdateService {
   /** User opted in to installing the downloaded update the next time they quit. */
   setInstallOnQuit(enabled: boolean): UpdateState {
     if (this.status.kind !== 'downloaded' || !this.deps.backend?.setInstallOnQuit) {
-      throw new UpdateActionError('The update has not been downloaded yet.')
+      throw new UpdateActionError(tl('update.err.notDownloaded'))
     }
     this.deps.backend.setInstallOnQuit(enabled)
     this.set({ ...this.status, installOnQuit: enabled })

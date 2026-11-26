@@ -27,6 +27,7 @@ import { existsSync, mkdtempSync } from 'node:fs'
 import { BRAND } from '@shared/brand'
 import { DATABASE_FILE, resolveUserDataDir } from './system/userDataDir'
 import { tmpdir } from 'node:os'
+import { setLanguageSource, translate } from '@shared/i18n'
 
 // Lets automated tests run against a throwaway profile. The smoke test
 // always uses a fresh temporary profile so it can never touch real data.
@@ -60,10 +61,10 @@ let quitting = false
 function showFatalError(title: string, err: unknown): void {
   const detail = err instanceof Error ? err.message : String(err)
   console.error(`[fatal] ${title}:`, err)
-  const advice =
-    err instanceof MigrationError
-      ? 'Your data has not been changed: the update stopped before modifying it.'
-      : 'Your data file has not been deleted.'
+  // Settings live in the database that failed to open, so the language is
+  // unknown here: the advice is given in both languages.
+  const key = err instanceof MigrationError ? 'err.fatalUnchanged' : 'err.fatalKept'
+  const advice = `${translate('ar', key)}\n${translate('en', key)}`
   dialog.showErrorBox(title, `${detail}\n\n${advice}\n\nDatabase: ${databasePath}\nLog: ${logFile}`)
 }
 
@@ -88,7 +89,7 @@ if (SMOKE) {
     try {
       db = openDatabase(databasePath)
     } catch (err) {
-      showFatalError(`${BRAND.name} could not open its database`, err)
+      showFatalError(`${translate('ar', 'err.fatalDatabase')} — ${translate('en', 'err.fatalDatabase')}`, err)
       app.exit(1)
       return
     }
@@ -105,6 +106,7 @@ if (SMOKE) {
     const loadSettings = (): AppSettings =>
       settingsRepo.getAll((key) => console.warn(`[settings] ignored invalid stored value for "${key}"`))
     let settings = loadSettings()
+    setLanguageSource(() => settings.language)
     applyThemeSource(settings.theme)
     hardenSessions()
 
@@ -217,6 +219,7 @@ if (SMOKE) {
           tray.update(timerService.getState())
         } else tray.disable()
       }
+      if (key === 'language' && tray.active) tray.update(timerService.getState())
       if (key === 'launchOnStartup') {
         applyLaunchOnStartup(settings.launchOnStartup).catch((err) =>
           console.error('[startup] could not update launch at login:', err)

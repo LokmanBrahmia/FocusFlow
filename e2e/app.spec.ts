@@ -24,12 +24,25 @@ async function launch(extraEnv: Record<string, string> = {}): Promise<void> {
     env: { ...process.env, FOCUSFLOW_USER_DATA: profile, ELECTRON_RENDERER_URL: '', ...extraEnv }
   })
   page = await app.firstWindow()
-  await page.waitForSelector('nav[aria-label="Main navigation"], aside[aria-label="Main navigation"]')
+  // The sidebar's label is translated, so wait for the element itself.
+  await page.waitForSelector('aside')
 }
 
+/** Saves a language through the same bridge the Settings screen uses. */
+async function setLanguage(lang: 'ar' | 'en'): Promise<void> {
+  await page.evaluate(async (l) => {
+    const w = globalThis as unknown as { desktop: DesktopAPI }
+    await w.desktop.settings.update('language', l)
+  }, lang)
+  await expect(page.locator('html')).toHaveAttribute('lang', lang)
+}
+
+// New installs start in Arabic. Most tests below drive the English interface,
+// so they switch the throwaway profile to English first (it persists).
 test.beforeEach(async () => {
   profile = mkdtempSync(join(tmpdir(), 'focusflow-e2e-'))
   await launch()
+  await setLanguage('en')
 })
 
 test.afterEach(async () => {
@@ -70,7 +83,7 @@ test('creates a task, then completes it', async () => {
 
 test('starts a focus session from a task and pauses it', async () => {
   await nav('Tasks').click()
-  await page.getByRole('button', { name: 'Add a task' }).click()
+  await page.getByRole('button', { name: /^New task/ }).click()
   await page.getByRole('dialog', { name: 'New task' }).getByLabel('Title').fill('Read chapter 5')
   await page.getByRole('button', { name: 'Add task' }).click()
 
@@ -123,6 +136,64 @@ test('opens the floating timer, which shows the same timer', async () => {
   const main = await page.getByRole('timer').getAttribute('aria-label')
   await expect(mini.getByRole('timer')).toHaveAttribute('aria-label', main ?? '')
   await expect(page.getByRole('button', { name: 'Close mini timer' })).toBeVisible()
+})
+
+test('adds a task inline with Enter', async () => {
+  await nav('Tasks').click()
+  await page.getByRole('textbox', { name: 'New task title' }).fill('Summarise lecture 7')
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('status').filter({ hasText: 'Task added' })).toBeVisible()
+  await expect(page.getByRole('listitem').filter({ hasText: 'Summarise lecture 7' })).toBeVisible()
+})
+
+// ── language and direction ─────────────────────────────────────────────────
+
+test('a new install starts in Arabic, laid out right to left', async () => {
+  await app.close()
+  rmSync(profile, { recursive: true, force: true })
+  profile = mkdtempSync(join(tmpdir(), 'focusflow-e2e-'))
+  await launch()
+
+  const html = page.locator('html')
+  await expect(html).toHaveAttribute('lang', 'ar')
+  await expect(html).toHaveAttribute('dir', 'rtl')
+  await expect(page.getByRole('complementary', { name: 'التنقّل الرئيسي' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'المهام', exact: true })).toBeVisible()
+
+  // The sidebar sits on the right in RTL.
+  const box = await page.locator('aside').boundingBox()
+  const width = page.viewportSize()?.width ?? (await page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth))
+  expect(box && box.x + box.width).toBeGreaterThan(width - 2)
+
+  // The timer reads left to right inside the Arabic layout.
+  await page.getByRole('link', { name: 'التركيز', exact: true }).click()
+  await expect(page.getByRole('timer')).toHaveAttribute('aria-label', /^\d{2}:\d{2}$/)
+  await expect(page.locator('.timer-digits')).toHaveAttribute('dir', 'ltr')
+})
+
+test('switching language mirrors the layout and survives a restart', async () => {
+  await nav('Settings').click()
+  await page.getByRole('radio', { name: 'العربية' }).click()
+  const html = page.locator('html')
+  await expect(html).toHaveAttribute('dir', 'rtl')
+  await expect(page.getByRole('heading', { level: 1, name: 'الإعدادات' })).toBeVisible()
+  // Wait until the main process has stored it, as a user's next restart would.
+  await expect
+    .poll(() =>
+      page.evaluate(async () => (await (globalThis as unknown as { desktop: DesktopAPI }).desktop.settings.getAll()).language)
+    )
+    .toBe('ar')
+
+  await app.close()
+  await launch()
+  // A new window: query <html> again.
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ar')
+
+  await page.getByRole('link', { name: 'الإعدادات', exact: true }).click()
+  await page.getByRole('radio', { name: 'English' }).click()
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
+  await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible()
 })
 
 // ── updates ────────────────────────────────────────────────────────────────

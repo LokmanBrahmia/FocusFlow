@@ -11,6 +11,7 @@ import {
   type TimeBlockInput
 } from '@shared/planner'
 import type { TaskRepository } from './taskRepository'
+import { tl } from '@shared/i18n'
 
 interface BlockRow {
   id: string
@@ -99,7 +100,7 @@ export class PlannerRepository {
 
   private assertBlock(b: TimeBlockInput, exceptId?: string): void {
     if (!this.db.prepare('SELECT 1 FROM tasks WHERE id = ?').get(b.taskId)) {
-      throw new InputError('That task no longer exists.')
+      throw new InputError(tl('err.taskGone'))
     }
     // Times are zero-padded HH:MM, so string comparison is chronological.
     const clash = this.db
@@ -109,7 +110,7 @@ export class PlannerRepository {
       )
       .get(b.date, exceptId ?? null, b.end, b.start) as { start_time: string; end_time: string } | undefined
     if (clash) {
-      throw new InputError(`This overlaps another block (${clash.start_time}–${clash.end_time}).`)
+      throw new InputError(tl('err.overlap', { start: clash.start_time, end: clash.end_time }))
     }
   }
 
