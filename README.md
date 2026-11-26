@@ -4,7 +4,8 @@
 
 # عَزم · Azm
 
-**«بِعزمٍ، خطوةً بعد خطوة»**<br />
+**«بِعزمٍ، خطوةً بعد خطوة»**
+
 *Steady focus. Meaningful progress.*
 
 A calm, offline focus timer, task manager and study planner for the desktop.<br />
