@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { ArrowDown, Download, MonitorSmartphone, WifiOff } from '@lucide/vue'
 import { useLatestRelease } from '../useLatestRelease'
+import focusShot from '../assets/screenshots/focus.webp'
 
 const release = useLatestRelease()
 const version = computed(() => (release.value.status === 'ready' ? release.value.release.version : null))
@@ -49,7 +50,7 @@ const version = computed(() => (release.value.status === 'ready' ? release.value
     <figure class="hero-shot mt-14">
       <div class="overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_24px_60px_-36px_rgb(0_0_0/0.5)]">
         <img
-          src="/screenshots/focus.webp"
+          :src="focusShot"
           width="1600"
           height="1000"
           alt="The Azm Focus screen: a large circular countdown at 23:58 for the task 'Derive backpropagation for a two-layer network', with Pause, Reset and Skip buttons."

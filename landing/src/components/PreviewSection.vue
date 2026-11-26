@@ -1,33 +1,39 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+// Imported, not served from public/, so each build gives them content-hashed
+// URLs: a new screenshot is never hidden behind a browser's cached copy.
+import planner from '../assets/screenshots/planner.webp'
+import week from '../assets/screenshots/week.webp'
+import tasks from '../assets/screenshots/tasks.webp'
+import stats from '../assets/screenshots/stats.webp'
 
 /** Real screenshots of the app (sample data), switched by tabs. */
 const screens = [
   {
     id: 'planner',
     label: 'Planner',
-    src: '/screenshots/planner.webp',
+    src: planner,
     caption: 'Plan study blocks for the day and see, next to them, the focus you actually recorded.',
     alt: 'Day planner: a timeline with planned study blocks on the left, recorded focus sessions on the right, and the day’s tasks with progress bars.'
   },
   {
     id: 'week',
     label: 'Week',
-    src: '/screenshots/week.webp',
+    src: week,
     caption: 'Seven days side by side, with planned and focused time for each. Drag a task to another day to move it.',
     alt: 'Week planner: seven columns with planned and focused time bars and the tasks planned for each day.'
   },
   {
     id: 'tasks',
     label: 'Tasks',
-    src: '/screenshots/tasks.webp',
+    src: tasks,
     caption: 'Tasks grouped by subject, with priorities, deadlines and focused time against your estimate.',
     alt: 'Task list filtered by subject, showing priorities, deadlines and progress against estimates.'
   },
   {
     id: 'stats',
     label: 'Statistics',
-    src: '/screenshots/stats.webp',
+    src: stats,
     caption: 'Focus time per day against your goal, completed Pomodoros, tasks and your study streak.',
     alt: 'Statistics: focus time, Pomodoros, tasks completed and study streak, with a bar chart of focus time per day.'
   }
