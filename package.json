@@ -1,7 +1,7 @@
 {
   "name": "focusflow",
   "productName": "Azm",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Azm (عَزم) — a calm focus timer, task manager and study planner",
   "main": "./out/main/index.js",
   "author": "Azm",
