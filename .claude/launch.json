@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "landing-static",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["landing/scripts/serve-dist.mjs", "4173"],
+      "port": 4173
+    }
+  ]
+}
