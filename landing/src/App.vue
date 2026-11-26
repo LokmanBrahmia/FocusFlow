@@ -8,11 +8,14 @@ import PrivacySection from './components/PrivacySection.vue'
 import DownloadSection from './components/DownloadSection.vue'
 import FaqSection from './components/FaqSection.vue'
 import SiteFooter from './components/SiteFooter.vue'
+import { m, useDocumentLanguage } from './i18n'
+
+useDocumentLanguage()
 </script>
 
 <template>
-  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2">
-    Skip to content
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:start-3 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2">
+    {{ m.skip }}
   </a>
   <SiteHeader />
   <main id="main">

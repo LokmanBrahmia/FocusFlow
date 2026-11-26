@@ -1,64 +1,49 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { CircleAlert, Download, ExternalLink, LoaderCircle } from '@lucide/vue'
-import { formatSize, releasesPage, type PackageKind } from '../release'
+import { releasesPage, sizeInMB, type PackageKind } from '../release'
 import { REPOSITORY } from '../site'
 import { useLatestRelease } from '../useLatestRelease'
+import { fill, locale, m } from '../i18n'
 
 const state = useLatestRelease()
 
-interface Platform {
-  kind: PackageKind
-  os: string
-  format: string
-  arch: string
-  requirement: string
-  install: (file: string) => string
+const KINDS: PackageKind[] = ['rpm', 'deb', 'exe']
+const INSTALL: Record<PackageKind, (file: string) => string> = {
+  rpm: (f) => `sudo dnf install ./${f}`,
+  deb: (f) => `sudo apt install ./${f}`,
+  exe: () => ''
 }
-
-const platforms: Platform[] = [
-  {
-    kind: 'rpm',
-    os: 'Fedora Linux',
-    format: 'RPM package',
-    arch: 'x86_64',
-    requirement: 'Tested on Fedora 41. Needs glibc 2.34 or newer (Fedora 35+).',
-    install: (f) => `sudo dnf install ./${f}`
-  },
-  {
-    kind: 'deb',
-    os: 'Ubuntu Linux',
-    format: 'DEB package',
-    arch: 'x64 (amd64)',
-    requirement: 'Tested on Ubuntu 22.04 LTS. Needs glibc 2.34 or newer.',
-    install: (f) => `sudo apt install ./${f}`
-  },
-  {
-    kind: 'exe',
-    os: 'Windows',
-    format: 'EXE installer',
-    arch: 'x64',
-    requirement: 'Windows 10 or 11, 64-bit. Installs for your user only, no administrator rights needed.',
-    install: () => ''
-  }
-]
+const platforms = computed(() => KINDS.map((kind) => ({ kind, ...m.value.download.platforms[kind], install: INSTALL[kind] })))
 
 const release = computed(() => (state.value.status === 'ready' ? state.value.release : null))
 const pageUrl = computed(() => (REPOSITORY ? releasesPage(REPOSITORY) : null))
 
+const intro = computed(() => {
+  const r = release.value
+  const d = m.value.download
+  if (!r) return d.fallback
+  const date = r.publishedAt
+    ? fill(d.released, { date: new Date(r.publishedAt).toLocaleDateString(locale.value, { day: 'numeric', month: 'long', year: 'numeric' }) })
+    : ''
+  return `${fill(d.version, { version: r.version })}${date}. ${d.served}`
+})
+
 /** Why a card has no download button. Null when the button is real. */
 function unavailable(kind: PackageKind): string | null {
-  switch (state.value.status) {
+  const d = m.value.download
+  const s = state.value
+  switch (s.status) {
     case 'unconfigured':
-      return 'Downloads will appear here once Azm’s GitHub repository is set up.'
+      return d.unconfigured
     case 'loading':
       return null
     case 'none':
-      return 'No stable release has been published yet.'
+      return d.none
     case 'error':
-      return `${state.value.message} You can still find every release on GitHub.`
+      return `${fill(d.errors[s.reason], { status: s.httpStatus ?? '' })} ${d.errorSuffix}`
     case 'ready':
-      return state.value.release.assets[kind] ? null : `Not included in version ${state.value.release.version}.`
+      return s.release.assets[kind] ? null : fill(d.notIncluded, { version: s.release.version })
   }
 }
 </script>
@@ -66,50 +51,43 @@ function unavailable(kind: PackageKind): string | null {
 <template>
   <section id="download" aria-labelledby="download-title" class="border-t border-line bg-surface/50">
     <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8">
-      <h2 id="download-title" class="display text-[clamp(1.9rem,3.6vw,2.75rem)]">Download Azm</h2>
-      <p class="mt-3 max-w-[40rem] text-lg text-muted">
-        <template v-if="release">
-          Version {{ release.version }}<template v-if="release.publishedAt">, released
-            {{ new Date(release.publishedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) }}</template>.
-          Files are served from GitHub Releases.
-        </template>
-        <template v-else>Packages are published on GitHub Releases.</template>
-      </p>
+      <h2 id="download-title" class="display text-[clamp(1.9rem,3.6vw,2.75rem)]">{{ m.download.title }}</h2>
+      <p class="mt-3 max-w-[40rem] text-lg text-muted">{{ intro }}</p>
 
       <ul class="mt-10 grid gap-5 md:grid-cols-3">
         <li v-for="p in platforms" :key="p.kind" class="flex flex-col rounded-2xl border border-line bg-bg p-6">
           <h3 class="text-xl font-semibold">{{ p.os }}</h3>
           <dl class="mt-4 grid grid-cols-[6.5rem_1fr] gap-y-1.5 text-sm">
-            <dt class="text-muted">Format</dt>
+            <dt class="text-muted">{{ m.download.format }}</dt>
             <dd>{{ p.format }}</dd>
-            <dt class="text-muted">Architecture</dt>
-            <dd>{{ p.arch }}</dd>
-            <dt class="text-muted">Version</dt>
+            <dt class="text-muted">{{ m.download.arch }}</dt>
+            <dd><bdi dir="ltr">{{ p.arch }}</bdi></dd>
+            <dt class="text-muted">{{ m.download.versionLabel }}</dt>
             <dd>
-              <span v-if="release">{{ release.version }}</span>
-              <span v-else-if="state.status === 'loading'" class="text-faint">Checking…</span>
-              <span v-else class="text-faint">Not available yet</span>
+              <span v-if="release" dir="ltr">{{ release.version }}</span>
+              <span v-else-if="state.status === 'loading'" class="text-faint">{{ m.download.checking }}</span>
+              <span v-else class="text-faint">{{ m.download.notYet }}</span>
             </dd>
           </dl>
           <p class="mt-4 text-sm text-muted">{{ p.requirement }}</p>
           <p v-if="release?.assets[p.kind] && p.install(release.assets[p.kind]!.name)" class="mt-4 text-xs text-muted">
-            Install from a terminal:
-            <code class="mt-1 block overflow-x-auto rounded-md bg-surface-2 px-2 py-1.5 whitespace-nowrap text-text">{{ p.install(release.assets[p.kind]!.name) }}</code>
+            {{ m.download.installFrom }}
+            <code dir="ltr" class="mt-1 block text-start overflow-x-auto rounded-md bg-surface-2 px-2 py-1.5 whitespace-nowrap text-text">{{ p.install(release.assets[p.kind]!.name) }}</code>
           </p>
 
           <div class="mt-auto pt-6">
             <p v-if="state.status === 'loading'" class="flex h-11 items-center gap-2 text-muted" role="status">
-              <LoaderCircle :size="17" class="animate-spin" aria-hidden="true" /> Checking the latest release…
+              <LoaderCircle :size="17" class="animate-spin" aria-hidden="true" /> {{ m.download.checkingRelease }}
             </p>
 
             <template v-else-if="release && release.assets[p.kind]">
               <a
                 :href="release.assets[p.kind]!.url"
                 class="flex h-11 items-center justify-center gap-2 rounded-xl bg-accent font-medium text-on-accent transition-[filter] hover:brightness-110"
-                :aria-label="`Download Azm ${release.version} for ${p.os} (${p.format})`"
+                :aria-label="fill(m.download.buttonLabel, { version: release.version, os: p.os, format: p.format })"
               >
-                <Download :size="17" :stroke-width="2" /> Download
-                <span class="font-normal text-on-accent/70">{{ formatSize(release.assets[p.kind]!.size) }}</span>
+                <Download :size="17" :stroke-width="2" /> {{ m.download.button }}
+                <span class="font-normal text-on-accent/70">{{ fill(m.download.mb, { n: sizeInMB(release.assets[p.kind]!.size) }) }}</span>
               </a>
             </template>
 
@@ -123,7 +101,7 @@ function unavailable(kind: PackageKind): string | null {
                 :href="release?.url ?? pageUrl"
                 class="mt-3 inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
               >
-                See releases on GitHub <ExternalLink :size="13" />
+                {{ m.download.seeReleases }} <ExternalLink :size="13" />
               </a>
             </template>
           </div>

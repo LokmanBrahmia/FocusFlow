@@ -1,7 +1,9 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/ibm-plex-sans';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-300.css';
 @import '@fontsource/ibm-plex-sans-arabic/arabic-400.css';
 @import '@fontsource/ibm-plex-sans-arabic/arabic-500.css';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-600.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -79,12 +81,28 @@
   line-height: 1.06;
 }
 
-/* Arabic text gets its own face and a taller line so marks above and below
-   the letters (fatha, kasra, tanwin) are not clipped. */
-:lang(ar) {
+/*
+ * Arabic is the page's primary language. Arabic text gets its own face and a
+ * taller line so marks above and below the letters (fatha, kasra, tanwin) are
+ * not clipped; the rem scale grows ~6% because Arabic glyphs read smaller;
+ * and tracking is removed because it breaks the joins of cursive script.
+ */
+@layer base {
+  :lang(ar) {
+    font-family: var(--font-arabic);
+    line-height: 1.7;
+  }
+  html:lang(ar) {
+    font-size: 17px;
+  }
+}
+:lang(ar) * {
+  letter-spacing: 0 !important;
+}
+.display:lang(ar) {
   font-family: var(--font-arabic);
-  line-height: 1.6;
-  letter-spacing: 0;
+  font-weight: 400;
+  line-height: 1.35;
 }
 
 @media (prefers-reduced-motion: reduce) {

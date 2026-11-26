@@ -1,32 +1,42 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="ar" dir="rtl" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Azm (عَزم) — Steady focus. Meaningful progress.</title>
+    <title>عَزم — بِعزمٍ، خطوةً بعد خطوة</title>
     <meta
       name="description"
-      content="Azm is a calm focus timer, task manager and study planner for your desktop. Works offline on Fedora, Ubuntu and Windows; your data stays on your computer."
+      content="عَزم مؤقّت تركيز هادئ ومدير مهام ومخطِّط دراسة لحاسوبك. يعمل دون إنترنت على Fedora وUbuntu وWindows، وتبقى بياناتك على جهازك."
     />
     <meta name="theme-color" content="#131517" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Azm" />
-    <meta property="og:title" content="Azm — Steady focus. Meaningful progress." />
+    <meta property="og:site_name" content="عَزم Azm" />
+    <meta property="og:locale" content="ar_AR" />
+    <meta property="og:locale:alternate" content="en_GB" />
+    <meta property="og:title" content="عَزم — بِعزمٍ، خطوةً بعد خطوة" />
     <meta
       property="og:description"
-      content="A calm, offline focus timer, task manager and study planner for Fedora, Ubuntu and Windows."
+      content="مؤقّت تركيز ومدير مهام ومخطِّط دراسة هادئ، يعمل دون إنترنت على Fedora وUbuntu وWindows. بالعربية والإنجليزية."
     />
     <!--og-absolute-->
     <meta name="twitter:card" content="summary_large_image" />
 
     <script>
-      // Apply a saved theme before paint (dark is the default). The storage key
-      // keeps its FocusFlow-era name so returning visitors keep their choice.
+      // Before paint: the saved theme (dark is the default; the key keeps its
+      // FocusFlow-era name) and the language (Arabic is the default; ?lang=en
+      // opens English), so the page never flashes in the wrong direction.
       try {
-        if (localStorage.getItem('focusflow-theme') === 'light') document.documentElement.classList.remove('dark')
+        var root = document.documentElement
+        if (localStorage.getItem('focusflow-theme') === 'light') root.classList.remove('dark')
+        var q = new URLSearchParams(location.search).get('lang')
+        var l = q === 'en' || q === 'ar' ? q : localStorage.getItem('azm-site-language')
+        if (l === 'en') {
+          root.lang = 'en'
+          root.dir = 'ltr'
+        }
       } catch (e) {}
     </script>
   </head>

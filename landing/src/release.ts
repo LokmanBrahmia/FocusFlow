@@ -27,7 +27,8 @@ export type ReleaseState =
   | { status: 'loading' }
   | { status: 'ready'; release: LatestRelease }
   | { status: 'none' }
-  | { status: 'error'; message: string }
+  /** Why the check failed; the page words it in the visitor's language. */
+  | { status: 'error'; reason: 'rate-limited' | 'http' | 'network'; httpStatus?: number }
 
 interface GitHubAsset {
   name: string
@@ -99,18 +100,19 @@ export async function fetchLatestRelease(
     })
     if (res.status === 404) return { status: 'none' }
     if (res.status === 403 || res.status === 429) {
-      return { status: 'error', message: 'GitHub is limiting requests right now.' }
+      return { status: 'error', reason: 'rate-limited' }
     }
-    if (!res.ok) return { status: 'error', message: `GitHub answered with status ${res.status}.` }
+    if (!res.ok) return { status: 'error', reason: 'http', httpStatus: res.status }
     const release = toLatestRelease((await res.json()) as GitHubRelease)
     return release ? { status: 'ready', release } : { status: 'none' }
   } catch {
-    return { status: 'error', message: 'The latest release could not be checked.' }
+    return { status: 'error', reason: 'network' }
   } finally {
     clearTimeout(timer)
   }
 }
 
-export function formatSize(bytes: number): string {
-  return `${Math.round(bytes / 1024 / 1024)} MB`
+/** Whole megabytes, for the download buttons. */
+export function sizeInMB(bytes: number): number {
+  return Math.round(bytes / 1024 / 1024)
 }
